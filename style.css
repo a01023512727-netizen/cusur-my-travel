@@ -365,7 +365,9 @@ body {
 
     .flight-cta-btn.pc-only {
         margin-top: 12px;
-        /* meta 아래 */
+        width: 200px;
+        min-width: 200px;
+        max-width: 200px;
     }
 
     /* PC에서만 PC 버튼 표시 */
