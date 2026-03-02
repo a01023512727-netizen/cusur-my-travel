@@ -1,8 +1,12 @@
 const OpenAI = require("openai");
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getClient() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey || apiKey.trim() === "" || apiKey.includes("본인의_실제_API_키")) {
+    return null;
+  }
+  return new OpenAI({ apiKey });
+}
 
 // 고정 프롬프트 ID (필요하면 환경변수로 분리 가능)
 const PROMPT_ID =
@@ -36,8 +40,13 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: "message is required" });
     }
 
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({ error: "Missing OPENAI_API_KEY" });
+    const client = getClient();
+    if (!client) {
+      return res.status(500).json({
+        error:
+          "OPENAI_API_KEY가 설정되지 않았습니다. .env 파일에 실제 API 키를 입력해 주세요.",
+        code: "MISSING_OPENAI_API_KEY",
+      });
     }
 
     const inputMessages = [];
