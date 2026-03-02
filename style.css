@@ -1,0 +1,823 @@
+/* VERSION: 2026-03-02 FULL-CSS v2 (vacation PC button under address + mobile order info/photo/button) */
+
+/* 기본 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #fff;
+}
+
+/* 네비게이션 */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 0.8px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li {
+    margin-left: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* 히어로 */
+.hero {
+    height: 60vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+        url('https://images.unsplash.com/photo-1499696010180-025ef6e1a8f9?auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+}
+
+.hero-content h1 {
+    font-size: 3.3rem;
+    margin-bottom: 20px;
+    font-weight: 900;
+    letter-spacing: -0.6px;
+}
+
+.hero-content p {
+    max-width: 700px;
+    font-size: 1.05rem;
+    margin: 0 auto;
+    opacity: 0.95;
+}
+
+/* 컨테이너 */
+.container {
+    padding: 80px 5%;
+}
+
+.bg-light {
+    background-color: #f9f9f9;
+}
+
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    text-align: left;
+    font-weight: 900;
+}
+
+.section-divider {
+    border: none;
+    border-top: 1px solid #eee;
+}
+
+/* =====================================================
+   행복한 휴가 섹션 (어두운 배경)
+   ===================================================== */
+.highlight-dark {
+    background: #2f343c;
+}
+
+.highlight-dark-container {
+    padding-top: 56px;
+    padding-bottom: 56px;
+}
+
+.highlight-dark-title {
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: -0.6px;
+    margin-bottom: 18px;
+}
+
+/* 세로 스크롤 리스트 */
+.highlight-vertical-list {
+    max-height: 980px;
+    overflow-y: auto;
+    padding-right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.highlight-vertical-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.highlight-vertical-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+}
+
+.highlight-vertical-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* 카드 */
+.dark-card {
+    background: transparent;
+    border-left: 2px solid rgba(255, 255, 255, 0.18);
+    padding-left: 22px;
+    width: 100%;
+}
+
+/* ✅ 모바일: 정보(텍스트) → 사진 → 버튼 순서로 보이게 (media에 버튼이 있으니 column-reverse) */
+.dark-card-inner {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 16px;
+}
+
+/* 텍스트 영역 */
+.dark-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    cursor: pointer;
+    padding-top: 6px;
+}
+
+.dark-card-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: #d9c7b9;
+    box-shadow: 0 0 0 6px rgba(217, 199, 185, 0.16);
+    margin-top: 7px;
+    flex: 0 0 auto;
+}
+
+.dark-card-kicker {
+    color: #d9c7b9;
+    font-weight: 900;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+}
+
+.dark-card-title {
+    color: #fff;
+    font-weight: 900;
+    font-size: 1.35rem;
+    letter-spacing: -0.2px;
+    margin-bottom: 8px;
+}
+
+.dark-card-desc {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.98rem;
+    line-height: 1.55;
+    margin-bottom: 6px;
+}
+
+.dark-card-link {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: underline;
+    font-weight: 800;
+    font-size: 0.95rem;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+.dark-card-chevron {
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 20px;
+    margin-top: 2px;
+    cursor: pointer;
+    transform: rotate(180deg);
+}
+
+/* 일정/주소/추가 정보(도착공항/예상참여) */
+.dark-card-meta-intext {
+    margin-top: 12px;
+    display: grid;
+    gap: 6px;
+}
+
+.meta-row {
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 0.95rem;
+}
+
+.meta-row strong {
+    color: rgba(255, 255, 255, 0.95);
+    margin-right: 8px;
+}
+
+.meta-row span {
+    color: rgba(255, 255, 255, 0.80);
+}
+
+/* 이미지 캐러셀 */
+.dark-card-carousel {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.10);
+}
+
+.dark-card-carousel::-webkit-scrollbar {
+    height: 10px;
+}
+
+.dark-card-carousel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+}
+
+.dark-card-carousel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.carousel-item {
+    flex: 0 0 auto;
+    width: 86vw;
+    scroll-snap-align: start;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    display: block;
+}
+
+/* 항공권 버튼 */
+.flight-cta-btn {
+    margin-top: 12px;
+    width: 100%;
+    height: 54px;
+    border-radius: 16px;
+    border: 0;
+    background: #00b7ff;
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.flight-cta-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ✅ PC/모바일 버튼 표시 전환 */
+.pc-only {
+    display: none;
+}
+
+.mobile-only {
+    display: block;
+}
+
+@media (min-width: 1024px) {
+
+    /* PC에서 카드 중앙정렬 제거 */
+    .dark-card {
+        margin-left: 0;
+        margin-right: 0;
+        max-width: none;
+    }
+
+    /* ✅ PC는 이미지(좌) 텍스트(우) */
+    .dark-card-inner {
+        flex-direction: row;
+        align-items: stretch;
+        /* ✅ 높이 맞춤 */
+        gap: 22px;
+    }
+
+    .dark-media {
+        flex: 0 0 480px;
+        max-width: 480px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dark-text {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        /* ✅ 아래로 CTA 붙이기 */
+    }
+
+    .dark-card-desc {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    /* PC에서 한 화면에 이미지 1.5장 정도 */
+    .dark-card-carousel .carousel-item {
+        width: clamp(320px, 66%, 520px);
+    }
+
+    .carousel-item img {
+        height: 360px;
+    }
+
+    /* ✅ CTA를 주소 아래쪽(=meta 아래)에 두고, 버튼 끝이 이미지 끝과 아래 정렬되도록 */
+    .dark-card-meta-intext {
+        margin-top: auto;
+        /* ✅ meta를 하단으로 밀기 */
+    }
+
+    .flight-cta-btn.pc-only {
+        margin-top: 12px;
+        /* meta 아래 */
+    }
+
+    /* PC에서만 PC 버튼 표시 */
+    .pc-only {
+        display: block;
+    }
+
+    .mobile-only {
+        display: none;
+    }
+}
+
+/* =====================================================
+   지도 + iOS 카드
+   ===================================================== */
+.map-wrapper {
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: #fff;
+}
+
+#map {
+    width: 100%;
+    height: 400px;
+    background: #eee;
+}
+
+.list-header {
+    padding: 30px 20px 10px;
+    text-align: center;
+}
+
+#festival-list-no-img {
+    padding: 18px 18px 28px;
+}
+
+.ios-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 18px 18px 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f0f0f0;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.ios-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.10);
+}
+
+.ios-badge {
+    background: #111;
+    color: #fff;
+    padding: 4px 10px;
+    font-size: 11px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    display: inline-block;
+    letter-spacing: 0.2px;
+    opacity: 0.92;
+}
+
+.ios-card h4 {
+    font-size: 18px;
+    margin: 10px 0 6px;
+    color: #1d1d1f;
+    line-height: 1.25;
+    font-weight: 900;
+}
+
+.ios-author {
+    color: #86868b;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.ios-info {
+    font-size: 14px;
+    color: #424245;
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
+}
+
+.ios-desc {
+    color: #5a5a5f;
+}
+
+.ios-card-footer {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #f5f5f7;
+    font-size: 14px;
+    font-weight: 900;
+    color: #0066cc;
+}
+
+/* 상세 */
+#detail-view {
+    padding: 30px;
+    background: #fff;
+}
+
+#detail-image {
+    width: 100%;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    max-height: 320px;
+    object-fit: cover;
+}
+
+.btn-back-flat {
+    width: 100%;
+    padding: 15px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 900;
+    margin-bottom: 20px;
+}
+
+/* 푸터 */
+.footer {
+    background: #111;
+    color: #fff;
+    padding: 60px 5% 20px;
+    text-align: center;
+}
+
+/* =====================================================
+   항공권 패널 + 날짜 팝업 (그대로 유지)
+   ===================================================== */
+.flight-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+    z-index: 2000;
+}
+
+.flight-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.flight-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    transform: translateY(105%);
+    transition: transform 220ms ease;
+    z-index: 2001;
+    box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.18);
+}
+
+.flight-sheet.is-open {
+    transform: translateY(0%);
+}
+
+.flight-sheet-handle {
+    width: 48px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.18);
+    margin: 10px auto 6px;
+}
+
+.flight-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 18px 14px;
+}
+
+.flight-sheet-title {
+    font-weight: 900;
+    font-size: 16px;
+}
+
+.flight-close {
+    border: 0;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 6px 8px;
+}
+
+.flight-form {
+    padding: 0 18px 18px;
+}
+
+.flight-card {
+    border: 1px solid #e6e6e6;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.flight-route {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.flight-airport .code {
+    font-weight: 900;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.flight-airport .city {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.swap {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: #444;
+    flex: 0 0 auto;
+}
+
+.flight-row {
+    display: flex;
+    gap: 10px;
+    padding-top: 14px;
+}
+
+.flight-row .icon {
+    width: 24px;
+    flex: 0 0 auto;
+}
+
+.flight-row-body {
+    flex: 1;
+}
+
+.flight-row-body .label {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 8px;
+}
+
+.flight-row-body .inputs {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.flight-row-body select {
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 0 10px;
+    font-size: 14px;
+}
+
+.flight-search-btn {
+    width: 100%;
+    margin-top: 14px;
+    height: 56px;
+    border-radius: 18px;
+    border: 0;
+    background: #00b7ff;
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.flight-hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* 날짜 팝업 (항공권 위) */
+.date-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+    z-index: 2200;
+}
+
+.date-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.date-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    transform: translateY(105%);
+    transition: transform 220ms ease;
+    z-index: 2201;
+    box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.18);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.date-sheet.is-open {
+    transform: translateY(0);
+}
+
+.date-sheet-header {
+    padding: 16px 18px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.date-sheet-title {
+    font-weight: 900;
+    font-size: 16px;
+}
+
+.date-sheet-close {
+    border: 0;
+    background: transparent;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px 8px;
+}
+
+.date-sheet-body {
+    padding: 8px 18px 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cal-month-title {
+    font-weight: 900;
+    font-size: 18px;
+    margin: 18px 0 10px;
+}
+
+.cal-weekdays,
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.cal-weekdays {
+    font-size: 12px;
+    color: #777;
+    padding: 8px 0;
+}
+
+.cal-day {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 700;
+    position: relative;
+}
+
+.cal-day.is-muted {
+    color: #bbb;
+}
+
+.cal-day.is-sun {
+    color: #ff4d4f;
+}
+
+.cal-day.is-sat {
+    color: #2f7fff;
+}
+
+.cal-day.is-selected {
+    background: #ff2fb3;
+    color: #fff;
+}
+
+.cal-day.is-start::after,
+.cal-day.is-end::after {
+    content: attr(data-badge);
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 900;
+    color: #ff2fb3;
+    white-space: nowrap;
+}
+
+.date-sheet-footer {
+    padding: 12px 18px 18px;
+    border-top: 1px solid #eee;
+    background: #fff;
+}
+
+.date-confirm-btn {
+    width: 100%;
+    height: 56px;
+    border-radius: 18px;
+    border: 0;
+    background: #00b7ff;
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+    .container {
+        padding: 50px 5%;
+    }
+
+    .hero-content h1 {
+        font-size: 2.4rem;
+    }
+
+    .carousel-item img {
+        height: 320px;
+    }
+}

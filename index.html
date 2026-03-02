@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예술 & 문화 - 글로벌 축제</title>
+    <link rel="stylesheet" href="style.css?v=20260302">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo">AMERICA THE BEAUTIFUL</div>
+            <ul class="nav-links">
+                <li><a href="#">여행지</a></li>
+                <li><a href="#">체험</a></li>
+                <li><a href="#">계획하기</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1 id="sheet-title">로딩 중...</h1>
+            <p id="sheet-subtitle">데이터를 불러오는 중입니다.</p>
+        </div>
+    </section>
+
+    <!-- 행복한 휴가 섹션(어두운 배경) -->
+    <section class="highlight-section highlight-dark">
+        <div class="container highlight-dark-container">
+            <h2 class="highlight-dark-title">행복한 휴가</h2>
+            <div id="highlight-slider" class="highlight-vertical-list"></div>
+        </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <section class="container bg-light" style="padding-top: 50px; padding-bottom: 80px;">
+        <h2 class="section-title">국가 간 문화 지도</h2>
+        <p style="margin-top: -20px; margin-bottom: 40px; color: #666;">지도를 통해 전 세계의 풍성한 문화 축제를 확인해 보세요.</p>
+
+        <div class="map-wrapper">
+            <div id="map"></div>
+
+            <div id="sidebar">
+                <div id="list-view">
+                    <div class="list-header">
+                        <h2 id="selected-country">실시간 축제 일정</h2>
+                    </div>
+                    <div id="festival-list-no-img"></div>
+                </div>
+
+                <div id="detail-view" style="display:none;">
+                    <button id="btn-back" class="btn-back-flat">← 목록으로 돌아가기</button>
+                    <img id="detail-image" src="" alt="축제 이미지">
+                    <h3 id="detail-name"></h3>
+                    <p id="detail-date" class="detail-date-text"></p>
+                    <p id="detail-desc"></p>
+                    <div id="detail-info-extra"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 Brand USA 클론 사이트 제작 프로젝트</p>
+    </footer>
+
+    <!-- =========================
+       항공권 패널(하단 시트)
+       ========================= -->
+    <div id="flight-backdrop" class="flight-backdrop" aria-hidden="true"></div>
+
+    <div id="flight-sheet" class="flight-sheet" aria-hidden="true">
+        <div class="flight-sheet-handle"></div>
+
+        <div class="flight-sheet-header">
+            <div class="flight-sheet-title">항공권 알아보기</div>
+            <button id="flight-close" class="flight-close" aria-label="close">✕</button>
+        </div>
+
+        <div class="flight-form">
+            <div class="flight-card">
+                <div class="flight-route">
+                    <div class="flight-airport">
+                        <div class="code" id="flight-from-code">ICN</div>
+                        <div class="city">서울(인천)</div>
+                    </div>
+
+                    <div class="swap">⇄</div>
+
+                    <div class="flight-airport">
+                        <div class="code" id="flight-to-code">---</div>
+                        <div class="city" id="flight-to-city">도착지</div>
+                    </div>
+                </div>
+
+                <!-- ✅ 날짜 선택: input date 직접 노출 대신, 클릭하면 팝업(날짜선택) -->
+                <div class="flight-row" id="flight-date-row" role="button" tabindex="0" style="cursor:pointer;">
+                    <div class="icon">📅</div>
+                    <div class="flight-row-body">
+                        <div class="label">여행 일정</div>
+
+                        <!-- 화면 표시용 -->
+                        <div class="inputs">
+                            <div id="flight-date-display" style="font-weight:800;">날짜 선택</div>
+                        </div>
+
+                        <!-- 실제 값 저장용(숨김) -->
+                        <input id="flight-date-start" type="hidden" />
+                        <input id="flight-date-end" type="hidden" />
+                    </div>
+                </div>
+
+                <div class="flight-row">
+                    <div class="icon">👤</div>
+                    <div class="flight-row-body">
+                        <div class="label">승객</div>
+                        <div class="inputs">
+                            <select id="flight-pax">
+                                <option value="1">성인 1</option>
+                                <option value="2">성인 2</option>
+                                <option value="3">성인 3</option>
+                                <option value="4">성인 4</option>
+                            </select>
+                            <select id="flight-cabin">
+                                <option value="economy">일반석</option>
+                                <option value="premium">프리미엄 이코노미</option>
+                                <option value="business">비즈니스</option>
+                                <option value="first">퍼스트</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="flight-search-btn" class="flight-search-btn">항공권 검색</button>
+
+            <div class="flight-hint">
+                출발지는 <strong>ICN</strong>으로 고정되며, 도착지는 선택한 축제의 공항코드(sheet B)를 사용합니다.
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================
+       날짜 선택 팝업(하단 시트)
+       ✅ CSS는 너가 이미 추가했다고 한 date-sheet/date-backdrop 사용
+       ========================= -->
+    <div id="date-backdrop" class="date-backdrop" aria-hidden="true"></div>
+
+    <div id="date-sheet" class="date-sheet" aria-hidden="true">
+        <div class="date-sheet-header">
+            <div class="date-sheet-title">날짜선택</div>
+            <button id="date-close" class="date-sheet-close" aria-label="close">✕</button>
+        </div>
+
+        <!-- 상/하 스크롤 캘린더 -->
+        <div id="date-sheet-body" class="date-sheet-body"></div>
+
+        <div class="date-sheet-footer">
+            <button id="date-confirm" class="date-confirm-btn">선택</button>
+        </div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGD9EKQ0DvWS5BEgueGyk0kubiGhC_4FI"></script>
+    <script src="components/MapComponent.js?v=20260302"></script>
+
+    <script>
+        // 히어로 섹션 텍스트 로드
+        fetch("/api/sheet")
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('sheet-title').innerText = data.title;
+                document.getElementById('sheet-subtitle').innerText = data.subtitle;
+            })
+            .catch(() => {
+                document.getElementById('sheet-title').innerText = "Global Festivals";
+                document.getElementById('sheet-subtitle').innerText = "전 세계의 축제를 한눈에 확인하세요";
+            });
+
+        window.onload = () => {
+            window.festivalMap = new FestivalMap('map');
+
+            // 상세에서 뒤로
+            document.getElementById('btn-back').onclick = () => window.festivalMap.toggleView('list');
+
+            // 항공권 패널 닫기
+            document.getElementById('flight-close').onclick = () => window.festivalMap?.closeFlightPanel?.();
+            document.getElementById('flight-backdrop').onclick = () => window.festivalMap?.closeFlightPanel?.();
+
+            // ✅ 날짜 선택 열기
+            const dateRow = document.getElementById('flight-date-row');
+            dateRow.onclick = () => window.festivalMap?.openDatePicker?.();
+            dateRow.onkeydown = (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    window.festivalMap?.openDatePicker?.();
+                }
+            };
+
+            // 날짜 팝업 닫기/확정
+            document.getElementById('date-close').onclick = () => window.festivalMap?.closeDatePicker?.();
+            document.getElementById('date-backdrop').onclick = () => window.festivalMap?.closeDatePicker?.();
+            document.getElementById('date-confirm').onclick = () => window.festivalMap?.confirmDatePicker?.();
+
+            // 항공권 검색 (데모)
+            document.getElementById('flight-search-btn').onclick = () => {
+                const from = document.getElementById('flight-from-code').innerText.trim();
+                const to = document.getElementById('flight-to-code').innerText.trim();
+                const d1 = document.getElementById('flight-date-start').value;
+                const d2 = document.getElementById('flight-date-end').value;
+                const pax = document.getElementById('flight-pax').value;
+                const cabin = document.getElementById('flight-cabin').value;
+
+                alert(`항공권 검색(데모)\n출발: ${from}\n도착: ${to}\n일정: ${d1 || "미지정"} ~ ${d2 || "미지정"}\n승객: ${pax}\n좌석: ${cabin}`);
+            };
+        };
+    </script>
+</body>
+
+</html>
