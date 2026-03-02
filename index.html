@@ -71,6 +71,42 @@
     </footer>
 
     <!-- =========================
+       AI 채팅 플로팅 버튼 & 패널
+       ========================= -->
+    <button id="ai-chat-fab" class="ai-chat-fab" aria-label="AI 여행 플래너 열기">
+        ✨ AI 여행 플래너
+    </button>
+
+    <div id="ai-chat-backdrop" class="ai-chat-backdrop" aria-hidden="true"></div>
+
+    <aside id="ai-chat-panel" class="ai-chat-panel" aria-hidden="true">
+        <header class="ai-chat-header">
+            <div>
+                <div class="ai-chat-title">AI 여행 플래너</div>
+                <div class="ai-chat-subtitle">축제/여행 계획을 물어보세요</div>
+            </div>
+            <div class="ai-chat-header-actions">
+                <button id="ai-chat-reset" class="ai-chat-reset" type="button">처음부터</button>
+                <button id="ai-chat-close" class="ai-chat-close" aria-label="닫기">✕</button>
+            </div>
+        </header>
+
+        <div class="ai-chat-body">
+            <div id="ai-chat-messages" class="ai-chat-messages">
+                <!-- 메시지 영역 -->
+            </div>
+            <aside id="ai-chat-reco" class="ai-chat-reco" aria-label="추천 일정 패널">
+                <!-- 추천 일정 카드 영역 -->
+            </aside>
+        </div>
+
+        <form id="ai-chat-form" class="ai-chat-input-row">
+            <input id="ai-chat-input" type="text" placeholder="무엇이 궁금하신가요?" autocomplete="off" />
+            <button type="submit">전송</button>
+        </form>
+    </aside>
+
+    <!-- =========================
        항공권 패널(하단 시트)
        ========================= -->
     <div id="flight-backdrop" class="flight-backdrop" aria-hidden="true"></div>
@@ -168,6 +204,7 @@
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGD9EKQ0DvWS5BEgueGyk0kubiGhC_4FI"></script>
     <script src="components/MapComponent.js?v=20260302"></script>
+    <script src="components/ChatWidget.js?v=20260302"></script>
 
     <script>
         // 히어로 섹션 텍스트 로드
@@ -207,16 +244,43 @@
             document.getElementById('date-backdrop').onclick = () => window.festivalMap?.closeDatePicker?.();
             document.getElementById('date-confirm').onclick = () => window.festivalMap?.confirmDatePicker?.();
 
-            // 항공권 검색 (데모)
+            // 항공권 검색 → 투어비스 새 창 이동
             document.getElementById('flight-search-btn').onclick = () => {
                 const from = document.getElementById('flight-from-code').innerText.trim();
                 const to = document.getElementById('flight-to-code').innerText.trim();
-                const d1 = document.getElementById('flight-date-start').value;
-                const d2 = document.getElementById('flight-date-end').value;
+                const start = document.getElementById('flight-date-start').value;
                 const pax = document.getElementById('flight-pax').value;
                 const cabin = document.getElementById('flight-cabin').value;
 
-                alert(`항공권 검색(데모)\n출발: ${from}\n도착: ${to}\n일정: ${d1 || "미지정"} ~ ${d2 || "미지정"}\n승객: ${pax}\n좌석: ${cabin}`);
+                if (!from || !to || !start) {
+                    alert('출발/도착 공항과 출발 날짜를 먼저 선택해 주세요.');
+                    return;
+                }
+
+                const depDate = new Date(start);
+                if (Number.isNaN(depDate.getTime())) {
+                    alert('출발 날짜 형식을 다시 확인해 주세요.');
+                    return;
+                }
+
+                // 3박 4일: 출발일 기준 +3일 귀국
+                const retDate = new Date(depDate.getTime());
+                retDate.setDate(retDate.getDate() + 3);
+
+                const fmt = (d) => {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    return `${y}${m}${dd}`;
+                };
+
+                const depStr = fmt(depDate);
+                const retStr = fmt(retDate);
+                const toCode = to.toLowerCase();
+
+                const url = `https://air.tourvis.com/flight/available/icn-${depStr}-${toCode}/${toCode}-${retStr}-icn?journeyType=RT&adult=${pax}&child=0&infant=0&cabin=${cabin === 'economy' ? 'Y' : cabin === 'premium' ? 'W' : cabin === 'business' ? 'C' : 'F'}`;
+
+                window.open(url, '_blank', 'noopener,noreferrer');
             };
         };
     </script>

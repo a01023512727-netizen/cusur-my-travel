@@ -10,12 +10,16 @@ if (typeof fetch === "undefined") {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// JSON body 파싱 (AI 채팅 POST용)
+app.use(express.json());
+
 // Serve static files (HTML, CSS, JS, images, etc.)
 app.use(express.static(path.join(__dirname)));
 
 // API routes wired to existing handlers
 app.get("/api/sheet", require("./api/sheet"));
 app.get("/api/festivals", require("./api/festivals"));
+app.post("/api/ai-chat", require("./api/ai-chat"));
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
