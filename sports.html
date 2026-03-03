@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>스포츠 - Beyond Borders</title>
-    <link rel="stylesheet" href="style.css?v=20260302">
+    <link rel="stylesheet" href="style.css?v=20260303">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 
@@ -29,24 +29,44 @@
         </div>
     </section>
 
-    <section class="container bg-light" style="padding-top: 50px; padding-bottom: 80px;">
-        <div class="sports-filters">
-            <label class="sports-filter-label">시즌</label>
-            <select id="sports-filter-season" class="sports-filter-select" aria-label="시즌 필터">
-                <option value="">전체</option>
-            </select>
-            <label class="sports-filter-label">리그</label>
-            <select id="sports-filter-league" class="sports-filter-select" aria-label="리그 필터">
-                <option value="">전체</option>
-            </select>
+    <div class="sports-page-wrap">
+        <!-- 리그별 라운드 태그 -->
+        <div class="sports-league-bar">
+            <div class="sports-league-tags" id="sports-league-tags">
+                <button type="button" class="sports-tag sports-tag-active" data-league="">전체</button>
+            </div>
         </div>
-        <h2 class="section-title">스포츠 일정</h2>
-        <p class="sports-intro">원하는 경기를 골라 일정에 맞춰 항공권을 예약해 보세요.</p>
 
-        <div id="sports-container">
+        <!-- 시즌 / 월별 선택 -->
+        <div class="sports-season-row">
+            <span class="sports-season-label">최근</span>
+            <div class="sports-season-year">
+                <button type="button" id="sports-year-prev" class="sports-year-btn" aria-label="이전 시즌">&lt;</button>
+                <span id="sports-year-display">2025-26</span>
+                <button type="button" id="sports-year-next" class="sports-year-btn" aria-label="다음 시즌">&gt;</button>
+            </div>
+            <button type="button" id="sports-calendar-btn" class="sports-calendar-btn" aria-label="날짜 선택">📅</button>
+        </div>
+        <div class="sports-month-bar">
+            <div class="sports-month-tags" id="sports-month-tags">
+                <!-- 8월~7월 등 동적 생성 -->
+            </div>
+            <span class="sports-month-more" aria-hidden="true">›</span>
+        </div>
+
+        <!-- 팀 필터 -->
+        <div class="sports-team-bar">
+            <div class="sports-team-filters" id="sports-team-filters">
+                <button type="button" class="sports-team-chip sports-team-chip-active" data-team="">팀 전체</button>
+            </div>
+            <span class="sports-team-more" aria-hidden="true">›</span>
+        </div>
+
+        <!-- 일자별 경기 일정 -->
+        <div class="sports-schedule" id="sports-schedule">
             <div class="sports-loading">로딩 중...</div>
         </div>
-    </section>
+    </div>
 
     <footer class="footer">
         <p>&copy; 2026 Brand USA 클론 사이트 제작 프로젝트</p>
@@ -54,7 +74,268 @@
 
     <script>
         (function () {
-            const container = document.getElementById("sports-container");
+            const leagueTagsEl = document.getElementById("sports-league-tags");
+            const monthTagsEl = document.getElementById("sports-month-tags");
+            const teamFiltersEl = document.getElementById("sports-team-filters");
+            const scheduleEl = document.getElementById("sports-schedule");
+            const yearDisplayEl = document.getElementById("sports-year-display");
+            const yearPrevBtn = document.getElementById("sports-year-prev");
+            const yearNextBtn = document.getElementById("sports-year-next");
+
+            let fullList = [];
+            let selectedLeague = "";
+            let selectedMonth = "";
+            let selectedTeam = "";
+            let selectedYear = "";
+
+            const MONTH_LABELS = ["8월", "9월", "10월", "11월", "12월", "1월", "2월", "3월", "4월", "5월", "6월", "7월"];
+            const MONTH_VALUES = [8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7];
+
+            function escapeAttr(s) {
+                const div = document.createElement("div");
+                div.textContent = s == null ? "" : String(s);
+                return div.innerHTML.replace(/"/g, "&quot;");
+            }
+            function escapeText(s) {
+                const div = document.createElement("div");
+                div.textContent = s == null ? "" : String(s);
+                return div.innerHTML;
+            }
+            function parseSheetDate(val) {
+                if (val == null || val === "") return null;
+                // 숫자: Google/Excel 시리얼(1899-12-30 기준 일수). UTC 날짜를 보정해 캘린더 날짜가 밀리지 않게 함
+                if (typeof val === "number") {
+                    const utcMs = (val - 25569) * 86400 * 1000;
+                    const d = new Date(utcMs);
+                    if (isNaN(d.getTime())) return null;
+                    return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds());
+                }
+                const s = String(val).trim();
+                // 일반텍스트: "2025-08-15 19:00:00" 또는 "2025-08-15" (공백/T 구분)
+                const iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T ](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+                if (iso) {
+                    const y = parseInt(iso[1], 10);
+                    const m = parseInt(iso[2], 10) - 1;
+                    const day = parseInt(iso[3], 10);
+                    const h = iso[4] != null ? parseInt(iso[4], 10) : 0;
+                    const min = iso[5] != null ? parseInt(iso[5], 10) : 0;
+                    const sec = iso[6] != null ? parseInt(iso[6], 10) : 0;
+                    const d = new Date(y, m, day, h, min, sec);
+                    return isNaN(d.getTime()) ? null : d;
+                }
+                // 시간만: "19:00:00" 또는 "19:00" (날짜는 dateEvent와 합칠 때 사용)
+                const timeOnly = s.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/);
+                if (timeOnly) {
+                    const h = parseInt(timeOnly[1], 10);
+                    const min = parseInt(timeOnly[2], 10);
+                    const sec = timeOnly[3] != null ? parseInt(timeOnly[3], 10) : 0;
+                    if (h >= 0 && h <= 23 && min >= 0 && min <= 59) {
+                        return new Date(1970, 0, 1, h, min, sec);
+                    }
+                }
+                // Date(년, 월, 일[, 시, 분, 초]) - 시트에서 1-based(1=1월, 8=8월)로 오면 -1
+                const dateMatch = s.match(/Date\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+)\s*)?)?\s*\)/i);
+                if (dateMatch) {
+                    const year = parseInt(dateMatch[1], 10);
+                    const month = parseInt(dateMatch[2], 10);
+                    const day = parseInt(dateMatch[3], 10);
+                    const hour = dateMatch[4] != null ? parseInt(dateMatch[4], 10) : 0;
+                    const min = dateMatch[5] != null ? parseInt(dateMatch[5], 10) : 0;
+                    const sec = dateMatch[6] != null ? parseInt(dateMatch[6], 10) : 0;
+                    const d = new Date(year, month - 1, day, hour, min, sec);
+                    return isNaN(d.getTime()) ? null : d;
+                }
+                return null;
+            }
+            function getMatchDateTime(item) {
+                const datePart = parseSheetDate(item.dateEvent);
+                const timePart = parseSheetDate(item.strTime);
+                if (timePart && !datePart) return timePart;
+                if (datePart && timePart)
+                    return new Date(datePart.getFullYear(), datePart.getMonth(), datePart.getDate(), timePart.getHours(), timePart.getMinutes(), timePart.getSeconds());
+                return datePart || null;
+            }
+            function formatTime(d) {
+                if (!d) return "--:--";
+                const h = String(d.getHours()).padStart(2, "0");
+                const m = String(d.getMinutes()).padStart(2, "0");
+                return h + ":" + m;
+            }
+            function formatDateHeader(d) {
+                if (!d) return "";
+                const month = d.getMonth() + 1;
+                const day = d.getDate();
+                const weekDay = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+                return month + "월 " + day + "일 (" + weekDay + ")";
+            }
+            function getMonthNum(d) {
+                return d ? d.getMonth() + 1 : 0;
+            }
+            function getYearNum(d) {
+                return d ? d.getFullYear() : 0;
+            }
+            function isFinished(item) {
+                const s = (item.strStatus || "").toLowerCase();
+                return s.includes("종료") || s === "finish" || s === "ft" || s === "ended";
+            }
+
+            function getFilteredList() {
+                return fullList.filter((item) => {
+                    if (selectedLeague && (item.strLeague || "").trim() !== selectedLeague) return false;
+                    const dt = getMatchDateTime(item);
+                    if (selectedMonth) {
+                        const m = getMonthNum(dt);
+                        if (String(m) !== String(selectedMonth)) return false;
+                    }
+                    if (selectedTeam) {
+                        const home = (item.homeTeam || "").trim();
+                        const away = (item.awayTeam || "").trim();
+                        if (home !== selectedTeam && away !== selectedTeam) return false;
+                    }
+                    if (selectedYear) {
+                        const y = getYearNum(dt);
+                        const startYear = parseInt(selectedYear.split("-")[0], 10);
+                        if (isNaN(startYear)) return true;
+                        if (selectedYear.indexOf("-") !== -1) {
+                            if (y !== startYear && y !== startYear + 1) return false;
+                        } else if (y !== startYear) return false;
+                    }
+                    return true;
+                });
+            }
+
+            function buildLeagueTags() {
+                const leagues = [...new Set(fullList.map((i) => (i.strLeague || "").trim()).filter(Boolean))].sort();
+                leagueTagsEl.innerHTML = '<button type="button" class="sports-tag sports-tag-active" data-league="">전체</button>';
+                leagues.forEach((name) => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "sports-tag";
+                    btn.setAttribute("data-league", name);
+                    btn.textContent = name;
+                    leagueTagsEl.appendChild(btn);
+                });
+                leagueTagsEl.querySelectorAll(".sports-tag").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        leagueTagsEl.querySelectorAll(".sports-tag").forEach((b) => b.classList.remove("sports-tag-active"));
+                        btn.classList.add("sports-tag-active");
+                        selectedLeague = btn.getAttribute("data-league") || "";
+                        renderSchedule();
+                    });
+                });
+            }
+
+            function buildMonthTags() {
+                const monthsWithData = new Set();
+                fullList.forEach((item) => {
+                    const dt = getMatchDateTime(item);
+                    if (dt) monthsWithData.add(dt.getMonth() + 1);
+                });
+                monthTagsEl.innerHTML = "";
+                MONTH_LABELS.forEach((label, idx) => {
+                    const monthNum = MONTH_VALUES[idx];
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "sports-month-tag";
+                    btn.setAttribute("data-month", monthNum);
+                    btn.textContent = label;
+                    if (selectedMonth === String(monthNum)) btn.classList.add("sports-month-tag-active");
+                    monthTagsEl.appendChild(btn);
+                });
+                monthTagsEl.querySelectorAll(".sports-month-tag").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        const month = btn.getAttribute("data-month");
+                        selectedMonth = selectedMonth === month ? "" : month;
+                        monthTagsEl.querySelectorAll(".sports-month-tag").forEach((b) => b.classList.remove("sports-month-tag-active"));
+                        if (selectedMonth) {
+                            const active = monthTagsEl.querySelector("[data-month=\"" + selectedMonth + "\"]");
+                            if (active) active.classList.add("sports-month-tag-active");
+                        }
+                        renderSchedule();
+                    });
+                });
+            }
+
+            function buildTeamFilters() {
+                const teams = new Set();
+                fullList.forEach((item) => {
+                    const h = (item.homeTeam || "").trim();
+                    const a = (item.awayTeam || "").trim();
+                    if (h) teams.add(h);
+                    if (a) teams.add(a);
+                });
+                const teamList = [...teams].sort();
+                teamFiltersEl.innerHTML = '<button type="button" class="sports-team-chip sports-team-chip-active" data-team="">팀 전체</button>';
+                teamList.forEach((name) => {
+                    const chip = document.createElement("button");
+                    chip.type = "button";
+                    chip.className = "sports-team-chip";
+                    chip.setAttribute("data-team", name);
+                    const badge = (fullList.find((i) => (i.homeTeam || "").trim() === name || (i.awayTeam || "").trim() === name) || {}).strHomeTeamBadge || (fullList.find((i) => (i.awayTeam || "").trim() === name) || {}).strAwayTeamBadge || "";
+                    chip.innerHTML = badge ? "<img class=\"sports-team-chip-badge\" src=\"" + escapeAttr(badge) + "\" alt=\"\">" + "<span>" + escapeText(name) + "</span>" : "<span>" + escapeText(name) + "</span>";
+                    teamFiltersEl.appendChild(chip);
+                });
+                teamFiltersEl.querySelectorAll(".sports-team-chip").forEach((chip) => {
+                    chip.addEventListener("click", () => {
+                        teamFiltersEl.querySelectorAll(".sports-team-chip").forEach((c) => c.classList.remove("sports-team-chip-active"));
+                        chip.classList.add("sports-team-chip-active");
+                        selectedTeam = chip.getAttribute("data-team") || "";
+                        renderSchedule();
+                    });
+                });
+            }
+
+            function renderSchedule() {
+                const list = getFilteredList();
+                const byDate = {};
+                list.forEach((item) => {
+                    const dt = getMatchDateTime(item);
+                    const key = dt ? (dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0") + "-" + String(dt.getDate()).padStart(2, "0")) : "unknown";
+                    if (!byDate[key]) byDate[key] = [];
+                    byDate[key].push(item);
+                });
+                const sortedDates = Object.keys(byDate).sort();
+
+                if (sortedDates.length === 0) {
+                    scheduleEl.innerHTML = '<div class="sports-empty">해당 조건의 경기가 없습니다.</div>';
+                    return;
+                }
+
+                let html = "";
+                sortedDates.forEach((key) => {
+                    const items = byDate[key];
+                    const first = items[0];
+                    const dt = getMatchDateTime(first);
+                    const dateLabel = dt ? formatDateHeader(dt) : key;
+                    html += "<div class=\"sports-date-group\"><div class=\"sports-date-header\">" + escapeText(dateLabel) + "</div>";
+                    items.forEach((item) => {
+                        const matchDt = getMatchDateTime(item);
+                        const timeStr = formatTime(matchDt);
+                        const finished = isFinished(item);
+                        const statusText = (item.strStatus || "").trim() || "-";
+                        const homeBadge = item.strHomeTeamBadge ? "<img class=\"sports-match-badge\" src=\"" + escapeAttr(item.strHomeTeamBadge) + "\" alt=\"\">" : "";
+                        const awayBadge = item.strAwayTeamBadge ? "<img class=\"sports-match-badge\" src=\"" + escapeAttr(item.strAwayTeamBadge) + "\" alt=\"\">" : "";
+                        const roundLabel = (item.strSeason || "").trim() ? escapeText(item.strSeason) + "R" : "";
+                        html += "<div class=\"sports-match-row\">";
+                        html += "<div class=\"sports-match-left\"><div class=\"sports-match-time\">" + escapeText(timeStr) + "</div><div class=\"sports-match-stadium\">" + escapeText(item.country || "-") + "</div></div>";
+                        html += "<div class=\"sports-match-center\">";
+                        html += "<div class=\"sports-match-team\">" + homeBadge + "<span class=\"sports-match-team-name\">" + escapeText(item.homeTeam || "-") + "</span></div>";
+                        html += "<div class=\"sports-match-score\">" + (finished ? "0" : "") + "</div>";
+                        html += "<div class=\"sports-match-status\">" + escapeText(statusText) + "</div>";
+                        html += "<div class=\"sports-match-score\">" + (finished ? "0" : "") + "</div>";
+                        html += "<div class=\"sports-match-team\">" + awayBadge + "<span class=\"sports-match-team-name\">" + escapeText(item.awayTeam || "-") + "</span></div>";
+                        html += "</div>";
+                        html += "<div class=\"sports-match-right\"><span class=\"sports-match-round\">" + escapeText(roundLabel) + "</span><div class=\"sports-match-actions\"><button type=\"button\" class=\"sports-match-btn\">응원 여행 가기</button></div></div>";
+                        html += "</div>";
+                    });
+                    html += "</div>";
+                });
+                scheduleEl.innerHTML = html;
+            }
+
+            function updateYearDisplay() {
+                if (selectedYear) yearDisplayEl.textContent = selectedYear;
+            }
 
             fetch("/api/sports")
                 .then((res) => {
@@ -63,153 +344,42 @@
                 })
                 .then((list) => {
                     if (!list || list.length === 0) {
-                        container.innerHTML = '<div class="sports-empty">표시할 스포츠 일정이 없습니다.</div>';
+                        scheduleEl.innerHTML = '<div class="sports-empty">표시할 스포츠 일정이 없습니다.</div>';
                         return;
                     }
-
-                    const seasonSelect = document.getElementById("sports-filter-season");
-                    const leagueSelect = document.getElementById("sports-filter-league");
-
-                    const seasons = [...new Set(list.map((i) => (i.strSeason || "").trim()).filter(Boolean))].sort();
-                    const leagues = [...new Set(list.map((i) => (i.strLeague || "").trim()).filter(Boolean))].sort();
-
-                    seasons.forEach((s) => {
-                        const opt = document.createElement("option");
-                        opt.value = s;
-                        opt.textContent = s;
-                        seasonSelect.appendChild(opt);
+                    fullList = list;
+                    const years = new Set();
+                    list.forEach((item) => {
+                        const dt = getMatchDateTime(item);
+                        if (dt) years.add(dt.getFullYear());
                     });
-                    leagues.forEach((s) => {
-                        const opt = document.createElement("option");
-                        opt.value = s;
-                        opt.textContent = s;
-                        leagueSelect.appendChild(opt);
+                    const yearArr = [...years].sort((a, b) => b - a);
+                    selectedYear = yearArr.length ? yearArr[0] + "-" + String((yearArr[0] % 100) + 1).padStart(2, "0") : "2025-26";
+
+                    buildLeagueTags();
+                    buildMonthTags();
+                    buildTeamFilters();
+                    updateYearDisplay();
+                    renderSchedule();
+
+                    yearPrevBtn.addEventListener("click", () => {
+                        const parts = selectedYear.split("-");
+                        const y = parseInt(parts[0], 10) || new Date().getFullYear();
+                        selectedYear = (y - 1) + "-" + String(y % 100).padStart(2, "0");
+                        updateYearDisplay();
+                        renderSchedule();
                     });
-
-                    function renderCards(data) {
-                        const grid = document.createElement("div");
-                        grid.className = "sports-grid";
-                        data.forEach((item) => {
-                            const card = document.createElement("div");
-                            card.className = "sports-card";
-
-                            const imgSrc = item.strPoster || item.strThumb || "";
-                            const posterHtml = imgSrc
-                                ? `<img class="sports-card-poster" src="${escapeAttr(imgSrc)}" alt="" loading="lazy">`
-                                : `<div class="sports-card-poster" style="background:#e0e0e0;display:flex;align-items:center;justify-content:center;color:#999;">No image</div>`;
-
-                            const leagueBadgeHtml = item.strLeagueBadge
-                                ? `<img class="sports-card-league" src="${escapeAttr(item.strLeagueBadge)}" alt="">`
-                                : "";
-
-                            const homeBadgeHtml = item.strHomeTeamBadge
-                                ? `<img class="sports-card-badge" src="${escapeAttr(item.strHomeTeamBadge)}" alt="">`
-                                : "";
-                            const awayBadgeHtml = item.strAwayTeamBadge
-                                ? `<img class="sports-card-badge" src="${escapeAttr(item.strAwayTeamBadge)}" alt="">`
-                                : "";
-
-                            const dateTimeStr = formatDateTime(item.dateEvent, item.strTime);
-
-                            card.innerHTML =
-                                posterHtml +
-                                `<div class="sports-card-body">
-                                    <div class="sports-card-meta">
-                                        ${leagueBadgeHtml}
-                                        ${item.strSeason ? `<span>${escapeText(item.strSeason)}</span>` : ""}
-                                        ${item.strLeague ? `<span>· ${escapeText(item.strLeague)}</span>` : ""}
-                                    </div>
-                                    <div class="sports-card-match">
-                                        <div class="sports-card-team">
-                                            ${homeBadgeHtml}
-                                            <span class="sports-card-team-name">${escapeText(item.homeTeam || "-")}</span>
-                                        </div>
-                                        <span class="sports-card-vs">VS</span>
-                                        <div class="sports-card-team">
-                                            ${awayBadgeHtml}
-                                            <span class="sports-card-team-name">${escapeText(item.awayTeam || "-")}</span>
-                                        </div>
-                                    </div>
-                                    <div class="sports-card-datetime">
-                                        ${escapeText(dateTimeStr)}
-                                        ${item.strStatus ? `<span class="sports-card-status">${escapeText(item.strStatus)}</span>` : ""}
-                                    </div>
-                                </div>`;
-
-                            grid.appendChild(card);
-                        });
-                        container.innerHTML = "";
-                        container.appendChild(grid);
-                    }
-
-                    function applyFilter() {
-                        const season = (seasonSelect.value || "").trim();
-                        const league = (leagueSelect.value || "").trim();
-                        const filtered = list.filter((item) => {
-                            if (season && (item.strSeason || "").trim() !== season) return false;
-                            if (league && (item.strLeague || "").trim() !== league) return false;
-                            return true;
-                        });
-                        renderCards(filtered);
-                    }
-
-                    seasonSelect.addEventListener("change", applyFilter);
-                    leagueSelect.addEventListener("change", applyFilter);
-
-                    renderCards(list);
+                    yearNextBtn.addEventListener("click", () => {
+                        const parts = selectedYear.split("-");
+                        const y = parseInt(parts[0], 10) || new Date().getFullYear();
+                        selectedYear = (y + 1) + "-" + String((y + 2) % 100).padStart(2, "0");
+                        updateYearDisplay();
+                        renderSchedule();
+                    });
                 })
                 .catch(() => {
-                    container.innerHTML = '<div class="sports-empty">일정을 불러오지 못했습니다. 서버와 시트 설정을 확인해 주세요.</div>';
+                    scheduleEl.innerHTML = '<div class="sports-empty">일정을 불러오지 못했습니다.</div>';
                 });
-
-            function escapeAttr(s) {
-                const div = document.createElement("div");
-                div.textContent = s;
-                return div.innerHTML.replace(/"/g, "&quot;");
-            }
-
-            function escapeText(s) {
-                const div = document.createElement("div");
-                div.textContent = s == null ? "" : String(s);
-                return div.innerHTML;
-            }
-
-            function parseSheetDate(val) {
-                if (val == null || val === "") return null;
-                if (typeof val === "number") {
-                    const d = new Date((val - 25569) * 86400 * 1000);
-                    return isNaN(d.getTime()) ? null : d;
-                }
-                const s = String(val).trim();
-                const m = s.match(/Date\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+)\s*)?)?\s*\)/i);
-                if (!m) return null;
-                const year = parseInt(m[1], 10);
-                const month = parseInt(m[2], 10);
-                const day = parseInt(m[3], 10);
-                const hour = m[4] != null ? parseInt(m[4], 10) : 0;
-                const min = m[5] != null ? parseInt(m[5], 10) : 0;
-                const sec = m[6] != null ? parseInt(m[6], 10) : 0;
-                const d = new Date(year, month - 1, day, hour, min, sec);
-                return isNaN(d.getTime()) ? null : d;
-            }
-
-            function formatDateTime(dateEvent, strTime) {
-                const datePart = parseSheetDate(dateEvent);
-                const timePart = parseSheetDate(strTime);
-                let d = datePart;
-                if (timePart && !datePart) d = timePart;
-                else if (datePart && timePart) {
-                    d = new Date(datePart.getFullYear(), datePart.getMonth(), datePart.getDate(),
-                        timePart.getHours(), timePart.getMinutes(), timePart.getSeconds());
-                }
-                if (!d) return "";
-                const y = d.getFullYear();
-                const M = String(d.getMonth() + 1).padStart(2, "0");
-                const D = String(d.getDate()).padStart(2, "0");
-                const h = String(d.getHours()).padStart(2, "0");
-                const m = String(d.getMinutes()).padStart(2, "0");
-                return y + "." + M + "." + D + " " + h + ":" + m;
-            }
         })();
     </script>
 </body>
