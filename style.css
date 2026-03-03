@@ -1199,6 +1199,7 @@ body {
 .sports-league-bar {
     padding: 16px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
 }
 
 .sports-league-tags {
@@ -1477,13 +1478,11 @@ body {
 
 .sports-match-status {
     width: 130px;
-    min-height: 32px;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    background: rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.95);
+    min-height: 24px;
+    padding: 0 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1491,6 +1490,7 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    background: transparent;
 }
 
 .sports-match-right {
@@ -1541,23 +1541,68 @@ body {
 }
 
 @media (max-width: 768px) {
-    .sports-match-row {
-        grid-template-columns: 80px 1fr;
-        grid-template-rows: auto auto;
+    .sports-league-bar {
+        padding: 12px 0;
+        margin: 0 -5%;
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+    .sports-league-tags {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
         gap: 8px;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
-    .sports-match-right {
-        grid-column: 2;
-        flex-direction: row;
-        justify-content: flex-end;
-        align-items: center;
+    .sports-league-tags::-webkit-scrollbar {
+        display: none;
     }
-    .sports-match-center {
-        grid-column: 1 / -1;
-        order: 2;
-        justify-content: flex-start;
+    .sports-tag {
+        flex-shrink: 0;
+    }
+
+    .sports-match-row {
+        grid-template-columns: 70px 1fr;
+        grid-template-rows: auto auto;
+        gap: 10px;
+        padding: 12px 10px;
+        min-height: auto;
     }
     .sports-match-left {
         order: 1;
+    }
+    .sports-match-right {
+        grid-column: 2;
+        order: 2;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+    }
+    .sports-match-center {
+        grid-column: 1 / -1;
+        order: 3;
+        grid-template-columns: minmax(0, 1fr) 28px 90px 28px minmax(0, 1fr);
+        gap: 6px;
+        max-width: 100%;
+        padding: 8px 0;
+    }
+    .sports-match-team {
+        min-width: 0;
+    }
+    .sports-match-team-name {
+        max-width: 100%;
+        font-size: 0.85rem;
+    }
+    .sports-match-status {
+        width: 88px;
+        font-size: 0.7rem;
+    }
+    .sports-match-badge {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
     }
 }
