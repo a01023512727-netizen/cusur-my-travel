@@ -325,9 +325,13 @@ class FestivalMap {
     if (!container) return;
 
     const highlights = this.allFestivals.filter(f => (f.isHighlight || "").toUpperCase() === "Y");
-    const data = highlights.length ? highlights : this.allFestivals.slice(0, 8);
 
-    container.innerHTML = data.map((f) => {
+    if (!highlights.length) {
+      container.innerHTML = '<p class="highlights-empty">행복한 휴가로 지정된 항목이 없습니다. (omaturi 시트 N열에 Y 또는 체크)</p>';
+      return;
+    }
+
+    container.innerHTML = highlights.map((f) => {
       const name = this.escapeHtml(f.name);
       const country = this.escapeHtml(f.country || "");
       const dateText = this.escapeHtml(`${f.startDate || ""} ~ ${f.endDate || ""}`.trim());

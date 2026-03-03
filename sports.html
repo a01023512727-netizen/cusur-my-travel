@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스포츠 - Beyond Borders</title>
+    <link rel="stylesheet" href="style.css?v=20260302">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo">Beyond Borders 최강</div>
+            <ul class="nav-links">
+                <li><a href="index.html">여행지</a></li>
+                <li><a href="sports.html" class="active">스포츠</a></li>
+                <li><a href="#">TOURVIS</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero hero-sports">
+        <div class="hero-content">
+            <h1>스포츠</h1>
+            <p>경기 일정을 확인하고, 일정에 맞춰 항공권을 예약해 보세요.</p>
+        </div>
+    </section>
+
+    <section class="container bg-light" style="padding-top: 50px; padding-bottom: 80px;">
+        <div class="sports-filters">
+            <label class="sports-filter-label">시즌</label>
+            <select id="sports-filter-season" class="sports-filter-select" aria-label="시즌 필터">
+                <option value="">전체</option>
+            </select>
+            <label class="sports-filter-label">리그</label>
+            <select id="sports-filter-league" class="sports-filter-select" aria-label="리그 필터">
+                <option value="">전체</option>
+            </select>
+        </div>
+        <h2 class="section-title">스포츠 일정</h2>
+        <p class="sports-intro">원하는 경기를 골라 일정에 맞춰 항공권을 예약해 보세요.</p>
+
+        <div id="sports-container">
+            <div class="sports-loading">로딩 중...</div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 Brand USA 클론 사이트 제작 프로젝트</p>
+    </footer>
+
+    <script>
+        (function () {
+            const container = document.getElementById("sports-container");
+
+            fetch("/api/sports")
+                .then((res) => {
+                    if (!res.ok) throw new Error("Failed to load sports");
+                    return res.json();
+                })
+                .then((list) => {
+                    if (!list || list.length === 0) {
+                        container.innerHTML = '<div class="sports-empty">표시할 스포츠 일정이 없습니다.</div>';
+                        return;
+                    }
+
+                    const seasonSelect = document.getElementById("sports-filter-season");
+                    const leagueSelect = document.getElementById("sports-filter-league");
+
+                    const seasons = [...new Set(list.map((i) => (i.strSeason || "").trim()).filter(Boolean))].sort();
+                    const leagues = [...new Set(list.map((i) => (i.strLeague || "").trim()).filter(Boolean))].sort();
+
+                    seasons.forEach((s) => {
+                        const opt = document.createElement("option");
+                        opt.value = s;
+                        opt.textContent = s;
+                        seasonSelect.appendChild(opt);
+                    });
+                    leagues.forEach((s) => {
+                        const opt = document.createElement("option");
+                        opt.value = s;
+                        opt.textContent = s;
+                        leagueSelect.appendChild(opt);
+                    });
+
+                    function renderCards(data) {
+                        const grid = document.createElement("div");
+                        grid.className = "sports-grid";
+                        data.forEach((item) => {
+                            const card = document.createElement("div");
+                            card.className = "sports-card";
+
+                            const imgSrc = item.strPoster || item.strThumb || "";
+                            const posterHtml = imgSrc
+                                ? `<img class="sports-card-poster" src="${escapeAttr(imgSrc)}" alt="" loading="lazy">`
+                                : `<div class="sports-card-poster" style="background:#e0e0e0;display:flex;align-items:center;justify-content:center;color:#999;">No image</div>`;
+
+                            const leagueBadgeHtml = item.strLeagueBadge
+                                ? `<img class="sports-card-league" src="${escapeAttr(item.strLeagueBadge)}" alt="">`
+                                : "";
+
+                            const homeBadgeHtml = item.strHomeTeamBadge
+                                ? `<img class="sports-card-badge" src="${escapeAttr(item.strHomeTeamBadge)}" alt="">`
+                                : "";
+                            const awayBadgeHtml = item.strAwayTeamBadge
+                                ? `<img class="sports-card-badge" src="${escapeAttr(item.strAwayTeamBadge)}" alt="">`
+                                : "";
+
+                            const dateTimeStr = formatDateTime(item.dateEvent, item.strTime);
+
+                            card.innerHTML =
+                                posterHtml +
+                                `<div class="sports-card-body">
+                                    <div class="sports-card-meta">
+                                        ${leagueBadgeHtml}
+                                        ${item.strSeason ? `<span>${escapeText(item.strSeason)}</span>` : ""}
+                                        ${item.strLeague ? `<span>· ${escapeText(item.strLeague)}</span>` : ""}
+                                    </div>
+                                    <div class="sports-card-match">
+                                        <div class="sports-card-team">
+                                            ${homeBadgeHtml}
+                                            <span class="sports-card-team-name">${escapeText(item.homeTeam || "-")}</span>
+                                        </div>
+                                        <span class="sports-card-vs">VS</span>
+                                        <div class="sports-card-team">
+                                            ${awayBadgeHtml}
+                                            <span class="sports-card-team-name">${escapeText(item.awayTeam || "-")}</span>
+                                        </div>
+                                    </div>
+                                    <div class="sports-card-datetime">
+                                        ${escapeText(dateTimeStr)}
+                                        ${item.strStatus ? `<span class="sports-card-status">${escapeText(item.strStatus)}</span>` : ""}
+                                    </div>
+                                </div>`;
+
+                            grid.appendChild(card);
+                        });
+                        container.innerHTML = "";
+                        container.appendChild(grid);
+                    }
+
+                    function applyFilter() {
+                        const season = (seasonSelect.value || "").trim();
+                        const league = (leagueSelect.value || "").trim();
+                        const filtered = list.filter((item) => {
+                            if (season && (item.strSeason || "").trim() !== season) return false;
+                            if (league && (item.strLeague || "").trim() !== league) return false;
+                            return true;
+                        });
+                        renderCards(filtered);
+                    }
+
+                    seasonSelect.addEventListener("change", applyFilter);
+                    leagueSelect.addEventListener("change", applyFilter);
+
+                    renderCards(list);
+                })
+                .catch(() => {
+                    container.innerHTML = '<div class="sports-empty">일정을 불러오지 못했습니다. 서버와 시트 설정을 확인해 주세요.</div>';
+                });
+
+            function escapeAttr(s) {
+                const div = document.createElement("div");
+                div.textContent = s;
+                return div.innerHTML.replace(/"/g, "&quot;");
+            }
+
+            function escapeText(s) {
+                const div = document.createElement("div");
+                div.textContent = s == null ? "" : String(s);
+                return div.innerHTML;
+            }
+
+            function parseSheetDate(val) {
+                if (val == null || val === "") return null;
+                if (typeof val === "number") {
+                    const d = new Date((val - 25569) * 86400 * 1000);
+                    return isNaN(d.getTime()) ? null : d;
+                }
+                const s = String(val).trim();
+                const m = s.match(/Date\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+)\s*)?)?\s*\)/i);
+                if (!m) return null;
+                const year = parseInt(m[1], 10);
+                const month = parseInt(m[2], 10);
+                const day = parseInt(m[3], 10);
+                const hour = m[4] != null ? parseInt(m[4], 10) : 0;
+                const min = m[5] != null ? parseInt(m[5], 10) : 0;
+                const sec = m[6] != null ? parseInt(m[6], 10) : 0;
+                const d = new Date(year, month - 1, day, hour, min, sec);
+                return isNaN(d.getTime()) ? null : d;
+            }
+
+            function formatDateTime(dateEvent, strTime) {
+                const datePart = parseSheetDate(dateEvent);
+                const timePart = parseSheetDate(strTime);
+                let d = datePart;
+                if (timePart && !datePart) d = timePart;
+                else if (datePart && timePart) {
+                    d = new Date(datePart.getFullYear(), datePart.getMonth(), datePart.getDate(),
+                        timePart.getHours(), timePart.getMinutes(), timePart.getSeconds());
+                }
+                if (!d) return "";
+                const y = d.getFullYear();
+                const M = String(d.getMonth() + 1).padStart(2, "0");
+                const D = String(d.getDate()).padStart(2, "0");
+                const h = String(d.getHours()).padStart(2, "0");
+                const m = String(d.getMinutes()).padStart(2, "0");
+                return y + "." + M + "." + D + " " + h + ":" + m;
+            }
+        })();
+    </script>
+</body>
+
+</html>

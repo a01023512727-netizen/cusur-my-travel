@@ -119,6 +119,12 @@ body {
     margin-bottom: 18px;
 }
 
+.highlights-empty {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    padding: 24px 0;
+}
+
 /* 세로 스크롤 리스트 */
 .highlight-vertical-list {
     max-height: 980px;
@@ -1174,4 +1180,158 @@ body {
     .carousel-item img {
         height: 320px;
     }
+}
+
+/* =====================================================
+   스포츠 페이지
+   ===================================================== */
+.hero-sports {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.sports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    padding: 0;
+}
+
+.sports-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sports-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.sports-card-poster {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    background: #f0f0f0;
+}
+
+.sports-card-body {
+    padding: 20px;
+}
+
+.sports-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.sports-card-league {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.sports-card-match {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0;
+    flex-wrap: nowrap;
+}
+
+.sports-card-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 100px;
+}
+
+.sports-card-badge {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.sports-card-team-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.sports-card-vs {
+    font-weight: 800;
+    color: #999;
+    font-size: 1rem;
+}
+
+.sports-card-datetime {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+}
+
+.sports-card-status {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: #e8f4fc;
+    color: #0f3460;
+}
+
+.sports-loading,
+.sports-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.nav-links a.active {
+    color: #0f3460;
+    font-weight: 800;
+}
+
+.sports-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.sports-filter-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.sports-filter-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    min-width: 140px;
+}
+
+.sports-intro {
+    margin-top: -20px;
+    margin-bottom: 40px;
+    color: #666;
+    font-size: 0.95rem;
 }

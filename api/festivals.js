@@ -7,11 +7,10 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: "Missing SHEET_ID env var" });
     }
 
-    // 7행부터 데이터가 있지만, 헤더가 1행에 있다면.
-    // 만약 1~6행이 비어있거나 다른 용도라면 'select * offset 6'으로 조정하세요.
+    // 1행: 헤더, 2행부터: 데이터 (전체 행 조회)
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
       `?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}` +
-      `&tq=${encodeURIComponent('select * offset 6')}`; // 7행부터 데이터 시작
+      `&tq=${encodeURIComponent('select * offset 1')}`; // 2행부터 데이터 시작
 
     const response = await fetch(url);
     const text = await response.text();
@@ -30,7 +29,14 @@ module.exports = async (req, res) => {
       lat: row.c[9]?.v || 0,           // J
       address: row.c[10]?.v || "",     // K
       attendance: row.c[11]?.v || 0,   // L
-      label: row.c[12]?.v || ""        // M (플래그로 사용)
+      label: row.c[12]?.v || "",       // M (플래그로 사용)
+      // N열: 행복한 휴가 노출 여부 (체크박스 true 또는 문자 Y/y)
+      isHighlight: (() => {
+        const raw = row.c[13]?.v;
+        if (raw === true) return "Y";
+        const s = String(raw ?? "").toUpperCase().trim();
+        return s === "Y" ? "Y" : "";
+      })()
     })).filter(item => item.name);
 
     res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");

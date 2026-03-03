@@ -19,6 +19,7 @@ app.use(express.static(path.join(__dirname)));
 // API routes wired to existing handlers
 app.get("/api/sheet", require("./api/sheet"));
 app.get("/api/festivals", require("./api/festivals"));
+app.get("/api/sports", require("./api/sports"));
 app.post("/api/ai-chat", require("./api/ai-chat"));
 
 app.listen(PORT, () => {
