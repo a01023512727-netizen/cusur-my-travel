@@ -29,6 +29,55 @@
         </div>
     </section>
 
+    <!-- 다가오는 축제 탐험 (계절별 퀵 필터 + 카드 그리드) -->
+    <section class="upcoming-section">
+        <div class="upcoming-wrap">
+            <div class="upcoming-header">
+                <div class="upcoming-header-text">
+                    <h2 class="upcoming-title">시즌별 축제 탐험</h2>
+                    <p class="upcoming-subtitle">봄, 여름, 가을, 겨울마다 펼쳐지는 특별한 축제를 만나보세요.</p>
+                </div>
+                <div class="upcoming-tabs" id="upcoming-season-tabs" aria-label="시즌 필터">
+                    <button type="button" class="upcoming-tab upcoming-tab-active" data-season="전체">전체</button>
+                    <button type="button" class="upcoming-tab" data-season="봄">🌸 봄 (3~5월)</button>
+                    <button type="button" class="upcoming-tab" data-season="여름">☀️ 여름 (6~8월)</button>
+                    <button type="button" class="upcoming-tab" data-season="가을">🍁 가을 (9~11월)</button>
+                    <button type="button" class="upcoming-tab" data-season="겨울">❄️ 겨울 (12~2월)</button>
+                </div>
+                <div class="upcoming-season-mobile">
+                    <label for="upcoming-season-select" class="upcoming-season-mobile-label">시즌</label>
+                    <select id="upcoming-season-select" class="upcoming-season-select" aria-label="시즌 선택">
+                        <option value="전체">전체</option>
+                        <option value="봄">🌸 봄 (3~5월)</option>
+                        <option value="여름">☀️ 여름 (6~8월)</option>
+                        <option value="가을">🍁 가을 (9~11월)</option>
+                        <option value="겨울">❄️ 겨울 (12~2월)</option>
+                    </select>
+                </div>
+            </div>
+            <div id="upcoming-grid" class="upcoming-grid">
+                <!-- 카드 그리드 (JS로 채움) -->
+            </div>
+            <div id="upcoming-empty" class="upcoming-empty" style="display: none;">
+                <div class="upcoming-empty-icon">🔍</div>
+                <h3 class="upcoming-empty-title">해당하는 축제가 없습니다</h3>
+                <p class="upcoming-empty-desc">다른 필터 조건을 선택해 보세요.</p>
+                <button type="button" id="upcoming-reset-btn" class="upcoming-reset-btn">필터 초기화</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 다가오는 축제 (리스트형) -->
+    <section class="coming-section">
+        <div class="coming-wrap">
+            <h2 class="coming-title">다가오는 축제</h2>
+            <p class="coming-subtitle">곧 다가올 축제 일정을 한눈에 확인하고 계획을 세워 보세요.</p>
+            <div id="coming-list" class="coming-list">
+                <!-- JS로 채움 -->
+            </div>
+        </div>
+    </section>
+
     <!-- 행복한 휴가 섹션(어두운 배경) -->
     <section class="highlight-section highlight-dark">
         <div class="container highlight-dark-container">
@@ -39,30 +88,40 @@
 
     <hr class="section-divider">
 
-    <section class="container bg-light" style="padding-top: 50px; padding-bottom: 80px;">
-        <h2 class="section-title">국가 간 문화 지도</h2>
-        <p style="margin-top: -20px; margin-bottom: 40px; color: #666;">지도를 통해 전 세계의 풍성한 문화 축제를 확인해 보세요.</p>
-
-        <div class="map-wrapper">
-            <div id="map"></div>
-
-            <div id="sidebar">
-                <div id="list-view">
-                    <div class="list-header">
-                        <h2 id="selected-country">실시간 축제 일정</h2>
-                    </div>
-                    <div id="festival-list-no-img"></div>
-                </div>
-
-                <div id="detail-view" style="display:none;">
-                    <button id="btn-back" class="btn-back-flat">← 목록으로 돌아가기</button>
-                    <img id="detail-image" src="" alt="축제 이미지">
-                    <h3 id="detail-name"></h3>
-                    <p id="detail-date" class="detail-date-text"></p>
-                    <p id="detail-desc"></p>
-                    <div id="detail-info-extra"></div>
-                </div>
+    <section class="map-section">
+        <div class="map-section-wrap">
+            <div class="map-section-header">
+                <h2 class="map-section-title">지도로 떠나는 축제 여행</h2>
+                <p class="map-section-desc">지도 위의 핀을 클릭하여 대륙별 특별한 축제 상품을 확인해보세요.</p>
             </div>
+
+            <div id="map-split-wrap" class="map-split-wrap">
+                <div class="map-split-left">
+                    <div class="map-country-filter">
+                        <label for="map-country-select" class="map-country-label">국가</label>
+                        <select id="map-country-select" class="map-country-select" aria-label="국가 선택">
+                            <option value="">전체</option>
+                        </select>
+                    </div>
+                    <div id="map" class="map-inner"></div>
+                </div>
+            <div class="map-split-right">
+                <div class="map-list-header">
+                    <h3 class="map-list-title">인기 축제 리스트</h3>
+                    <button type="button" id="map-reset-btn" class="map-list-reset" style="display: none;">초기화</button>
+                </div>
+                <div id="map-festival-list" class="map-festival-list"></div>
+            </div>
+            </div>
+        </div>
+
+        <div id="detail-view" class="map-detail-view" style="display:none;">
+            <button id="btn-back" class="btn-back-flat">← 목록으로 돌아가기</button>
+            <img id="detail-image" src="" alt="축제 이미지">
+            <h3 id="detail-name"></h3>
+            <p id="detail-date" class="detail-date-text"></p>
+            <p id="detail-desc"></p>
+            <div id="detail-info-extra"></div>
         </div>
     </section>
 
@@ -111,7 +170,7 @@
        ========================= -->
     <div id="flight-backdrop" class="flight-backdrop" aria-hidden="true"></div>
 
-    <div id="flight-sheet" class="flight-sheet" aria-hidden="true">
+    <div id="flight-sheet" class="flight-sheet" aria-hidden="true" data-round-trip="true">
         <div class="flight-sheet-handle"></div>
 
         <div class="flight-sheet-header">
@@ -119,51 +178,148 @@
             <button id="flight-close" class="flight-close" aria-label="close">✕</button>
         </div>
 
+        <!-- 축제 정보 (맵·유형·국가·축제명·일자·설명) -->
+        <div id="flight-festival-header" class="flight-festival-header" style="display: none;">
+            <div id="flight-festival-map" class="flight-festival-map" aria-hidden="false"></div>
+            <div class="flight-festival-body">
+                <div class="flight-festival-tags">
+                    <span id="flight-festival-type" class="flight-festival-tag flight-festival-tag-type"></span>
+                    <span id="flight-festival-country" class="flight-festival-tag flight-festival-tag-country"></span>
+                </div>
+                <h3 id="flight-festival-name" class="flight-festival-name"></h3>
+                <p class="flight-festival-meta">
+                    <span id="flight-festival-location" class="flight-festival-location"></span>
+                    <span id="flight-festival-date" class="flight-festival-date"></span>
+                </p>
+                <p id="flight-festival-desc" class="flight-festival-desc"></p>
+            </div>
+        </div>
+
         <div class="flight-form">
+            <!-- 왕복/편도 토글 -->
+            <div class="flight-trip-toggle-wrap">
+                <span class="flight-form-section-title">최적의 항공권 찾기</span>
+                <div class="flight-trip-toggle" id="flight-trip-toggle">
+                    <button type="button" class="flight-trip-btn active" id="flight-trip-round" data-trip="round">왕복</button>
+                    <button type="button" class="flight-trip-btn" id="flight-trip-one" data-trip="one">편도</button>
+                </div>
+            </div>
+
             <div class="flight-card">
                 <div class="flight-route">
                     <div class="flight-airport">
                         <div class="code" id="flight-from-code">ICN</div>
                         <div class="city">서울(인천)</div>
                     </div>
-
                     <div class="swap">⇄</div>
-
                     <div class="flight-airport">
                         <div class="code" id="flight-to-code">---</div>
                         <div class="city" id="flight-to-city">도착지</div>
                     </div>
                 </div>
 
-                <!-- ✅ 날짜 선택: input date 직접 노출 대신, 클릭하면 팝업(날짜선택) -->
-                <div class="flight-row" id="flight-date-row" role="button" tabindex="0" style="cursor:pointer;">
-                    <div class="icon">📅</div>
-                    <div class="flight-row-body">
-                        <div class="label">여행 일정</div>
-
-                        <!-- 화면 표시용 -->
-                        <div class="inputs">
-                            <div id="flight-date-display" style="font-weight:800;">날짜 선택</div>
+                <!-- 여행 일정 (퀵 2박/3박/4박 + 가는 날·오는 날 박스) -->
+                <div class="flight-calendar-block" id="flight-calendar-block">
+                    <div class="flight-calendar-head">
+                        <div class="flight-calendar-title-wrap">
+                            <span class="flight-calendar-icon">📅</span>
+                            <span class="flight-calendar-title">여행 일정</span>
                         </div>
-
-                        <!-- 실제 값 저장용(숨김) -->
-                        <input id="flight-date-start" type="hidden" />
-                        <input id="flight-date-end" type="hidden" />
+                        <div class="flight-quick-duration" id="flight-quick-duration">
+                            <div class="flight-quick-item">
+                                <button type="button" class="flight-quick-btn" data-nights="2">2박</button>
+                                <span class="flight-quick-price-txt">42만원~</span>
+                            </div>
+                            <div class="flight-quick-item">
+                                <button type="button" class="flight-quick-btn" data-nights="3">3박</button>
+                                <span class="flight-quick-price-txt">48만원~</span>
+                            </div>
+                            <div class="flight-quick-item">
+                                <button type="button" class="flight-quick-btn" data-nights="4">4박</button>
+                                <span class="flight-quick-price-txt">54만원~</span>
+                            </div>
+                        </div>
                     </div>
+                    <div class="flight-date-boxes">
+                        <div class="flight-date-box flight-date-depart" id="flight-date-depart-box" data-active="depart">
+                            <button type="button" class="flight-date-chevron" id="flight-depart-prev" aria-label="이전 날">‹</button>
+                            <div class="flight-date-inner" id="flight-depart-trigger">
+                                <p class="flight-date-label">가는 날</p>
+                                <p class="flight-date-value" id="flight-depart-display">선택</p>
+                            </div>
+                            <button type="button" class="flight-date-chevron" id="flight-depart-next" aria-label="다음 날">›</button>
+                        </div>
+                        <span class="flight-date-arrow" aria-hidden="true">→</span>
+                        <div class="flight-date-box flight-date-return" id="flight-date-return-box" data-active="return">
+                            <button type="button" class="flight-date-chevron" id="flight-return-prev" aria-label="이전 날">‹</button>
+                            <div class="flight-date-inner" id="flight-return-trigger">
+                                <p class="flight-date-label">오는 날</p>
+                                <p class="flight-date-value" id="flight-return-display">선택</p>
+                            </div>
+                            <button type="button" class="flight-date-chevron" id="flight-return-next" aria-label="다음 날">›</button>
+                        </div>
+                    </div>
+                    <div class="flight-recommend-bar" id="flight-recommend-bar">
+                        <div class="flight-recommend-title">
+                            <span class="flight-recommend-icon">★</span>
+                            <span class="flight-recommend-text">예상 최저가 일정 추천</span>
+                        </div>
+                        <div class="flight-recommend-line">
+                            <span class="flight-recommend-range" id="flight-recommend-range">2026.08.25(화) ~ 2026.08.27(목)</span>
+                            <span class="flight-recommend-price" id="flight-recommend-price">425,000원</span>
+                        </div>
+                    </div>
+                    <input id="flight-date-start" type="hidden" />
+                    <input id="flight-date-end" type="hidden" />
                 </div>
 
-                <div class="flight-row">
+                <div class="flight-row flight-row-passenger">
                     <div class="icon">👤</div>
-                    <div class="flight-row-body">
+                    <div class="flight-row-body flight-passenger-wrap">
                         <div class="label">승객</div>
                         <div class="inputs">
-                            <select id="flight-pax">
-                                <option value="1">성인 1</option>
-                                <option value="2">성인 2</option>
-                                <option value="3">성인 3</option>
-                                <option value="4">성인 4</option>
-                            </select>
-                            <select id="flight-cabin">
+                            <div class="flight-passenger-trigger-wrap" id="flight-passenger-wrap">
+                                <button type="button" id="flight-passenger-btn" class="flight-passenger-btn" aria-expanded="false" aria-haspopup="true">
+                                    <span id="flight-passenger-text">성인 1</span>
+                                    <span class="flight-passenger-chevron" aria-hidden="true">▼</span>
+                                </button>
+                                <div id="flight-passenger-popover" class="flight-passenger-popover" role="dialog" aria-label="승객 선택" hidden>
+                                    <div class="flight-passenger-row">
+                                        <div class="flight-passenger-label-wrap">
+                                            <span class="flight-passenger-label">성인</span>
+                                            <span class="flight-passenger-help" title="만 12세 이상">?</span>
+                                        </div>
+                                        <div class="flight-passenger-controls">
+                                            <button type="button" class="flight-passenger-minus" data-passenger="adult" aria-label="성인 감소">−</button>
+                                            <span id="flight-pax-adult-display" class="flight-passenger-num">1</span>
+                                            <button type="button" class="flight-passenger-plus" data-passenger="adult" aria-label="성인 증가">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="flight-passenger-row">
+                                        <div class="flight-passenger-label-wrap">
+                                            <span class="flight-passenger-label">아동</span>
+                                            <span class="flight-passenger-help" title="만 2세~12세 미만">?</span>
+                                        </div>
+                                        <div class="flight-passenger-controls">
+                                            <button type="button" class="flight-passenger-minus" data-passenger="child" aria-label="아동 감소">−</button>
+                                            <span id="flight-pax-child-display" class="flight-passenger-num">0</span>
+                                            <button type="button" class="flight-passenger-plus" data-passenger="child" aria-label="아동 증가">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="flight-passenger-row">
+                                        <div class="flight-passenger-label-wrap">
+                                            <span class="flight-passenger-label">유아</span>
+                                            <span class="flight-passenger-help" title="만 2세 미만">?</span>
+                                        </div>
+                                        <div class="flight-passenger-controls">
+                                            <button type="button" class="flight-passenger-minus" data-passenger="infant" aria-label="유아 감소">−</button>
+                                            <span id="flight-pax-infant-display" class="flight-passenger-num">0</span>
+                                            <button type="button" class="flight-passenger-plus" data-passenger="infant" aria-label="유아 증가">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <select id="flight-cabin" class="flight-cabin-select">
                                 <option value="economy">일반석</option>
                                 <option value="premium">프리미엄 이코노미</option>
                                 <option value="business">비즈니스</option>
@@ -174,11 +330,11 @@
                 </div>
             </div>
 
-            <button id="flight-search-btn" class="flight-search-btn">항공권 검색</button>
-
-            <div class="flight-hint">
-                출발지는 <strong>ICN</strong>으로 고정되며, 도착지는 선택한 축제의 공항코드(sheet B)를 사용합니다.
+            <div class="flight-dynamic-price-wrap">
+                <p class="flight-dynamic-price-label" id="flight-dynamic-price-label">예상 최저가</p>
+                <p class="flight-dynamic-price-amount" id="flight-dynamic-price">—</p>
             </div>
+            <button id="flight-search-btn" class="flight-search-btn">항공권 검색</button>
         </div>
     </div>
 
@@ -229,14 +385,95 @@
             document.getElementById('flight-close').onclick = () => window.festivalMap?.closeFlightPanel?.();
             document.getElementById('flight-backdrop').onclick = () => window.festivalMap?.closeFlightPanel?.();
 
-            // ✅ 날짜 선택 열기
-            const dateRow = document.getElementById('flight-date-row');
-            dateRow.onclick = () => window.festivalMap?.openDatePicker?.();
-            dateRow.onkeydown = (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    window.festivalMap?.openDatePicker?.();
+            // 왕복/편도 토글
+            const flightSheet = document.getElementById('flight-sheet');
+            const tripRound = document.getElementById('flight-trip-round');
+            const tripOne = document.getElementById('flight-trip-one');
+            const quickDuration = document.getElementById('flight-quick-duration');
+            const returnBox = document.getElementById('flight-date-return-box');
+            const returnArrow = document.querySelector('.flight-date-arrow');
+            const setRoundTrip = (round) => {
+                if (!flightSheet) return;
+                flightSheet.setAttribute('data-round-trip', round ? 'true' : 'false');
+                tripRound.classList.toggle('active', round);
+                tripOne.classList.toggle('active', !round);
+                if (quickDuration) quickDuration.style.display = round ? '' : 'none';
+                if (returnBox) returnBox.style.display = round ? '' : 'none';
+                if (returnArrow) returnArrow.style.display = round ? '' : 'none';
+                window.festivalMap?.updateFlightNightsLabel?.();
+            };
+            if (tripRound) tripRound.onclick = () => setRoundTrip(true);
+            if (tripOne) tripOne.onclick = () => setRoundTrip(false);
+
+            // 여행 일정: 날짜 선택(캘린더) 열기 + 박스 active
+            const departTrigger = document.getElementById('flight-depart-trigger');
+            const returnTrigger = document.getElementById('flight-return-trigger');
+            const departBox = document.getElementById('flight-date-depart-box');
+            const setCalendarActive = (box) => {
+                [departBox, returnBox].forEach(el => { if (el) el.classList.remove('active'); });
+                if (box) box.classList.add('active');
+            };
+            if (departTrigger) departTrigger.onclick = () => { setCalendarActive(departBox); window.festivalMap?.openDatePicker?.(); };
+            if (returnTrigger) returnTrigger.onclick = () => { setCalendarActive(returnBox); window.festivalMap?.openDatePicker?.(); };
+
+            // ISO 날짜에 일수 더하기 (YYYY-MM-DD 반환)
+            const addDays = (iso, days) => {
+                const d = new Date(iso + 'T12:00:00');
+                d.setDate(d.getDate() + days);
+                const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+            };
+
+            // 2박/3박/4박 퀵 버튼
+            document.querySelectorAll('.flight-quick-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const startEl = document.getElementById('flight-date-start');
+                    const endEl = document.getElementById('flight-date-end');
+                    const start = (startEl && startEl.value) || '';
+                    if (!start) return;
+                    const nights = parseInt(btn.getAttribute('data-nights'), 10) || 2;
+                    if (endEl) endEl.value = addDays(start, nights);
+                    window.festivalMap?.syncDateDisplayFromHidden?.();
+                };
+            });
+
+            // 가는 날 ◀ ▶
+            const startEl = document.getElementById('flight-date-start');
+            const endEl = document.getElementById('flight-date-end');
+            document.getElementById('flight-depart-prev').onclick = () => {
+                if (!startEl || !startEl.value) return;
+                startEl.value = addDays(startEl.value, -1);
+                if (endEl && endEl.value) {
+                    const s = new Date(startEl.value + 'T12:00:00').getTime();
+                    const e = new Date(endEl.value + 'T12:00:00').getTime();
+                    if (e <= s) endEl.value = addDays(startEl.value, 1);
                 }
+                window.festivalMap?.syncDateDisplayFromHidden?.();
+            };
+            document.getElementById('flight-depart-next').onclick = () => {
+                if (!startEl || !startEl.value) return;
+                startEl.value = addDays(startEl.value, 1);
+                if (endEl && endEl.value) {
+                    const s = new Date(startEl.value + 'T12:00:00').getTime();
+                    const e = new Date(endEl.value + 'T12:00:00').getTime();
+                    if (e <= s) endEl.value = addDays(startEl.value, 1);
+                }
+                window.festivalMap?.syncDateDisplayFromHidden?.();
+            };
+            document.getElementById('flight-return-prev').onclick = () => {
+                if (!endEl || !endEl.value) return;
+                endEl.value = addDays(endEl.value, -1);
+                if (startEl && startEl.value) {
+                    const s = new Date(startEl.value + 'T12:00:00').getTime();
+                    const e = new Date(endEl.value + 'T12:00:00').getTime();
+                    if (e < s) endEl.value = startEl.value;
+                }
+                window.festivalMap?.syncDateDisplayFromHidden?.();
+            };
+            document.getElementById('flight-return-next').onclick = () => {
+                if (!endEl || !endEl.value) return;
+                endEl.value = addDays(endEl.value, 1);
+                window.festivalMap?.syncDateDisplayFromHidden?.();
             };
 
             // 날짜 팝업 닫기/확정
@@ -244,13 +481,64 @@
             document.getElementById('date-backdrop').onclick = () => window.festivalMap?.closeDatePicker?.();
             document.getElementById('date-confirm').onclick = () => window.festivalMap?.confirmDatePicker?.();
 
+            // 승객 팝오버
+            const passengerBtn = document.getElementById('flight-passenger-btn');
+            const passengerPopover = document.getElementById('flight-passenger-popover');
+            const passengerText = document.getElementById('flight-passenger-text');
+            const getPax = () => ({
+                adult: parseInt(document.getElementById('flight-pax-adult-display').textContent, 10) || 1,
+                child: parseInt(document.getElementById('flight-pax-child-display').textContent, 10) || 0,
+                infant: parseInt(document.getElementById('flight-pax-infant-display').textContent, 10) || 0
+            });
+            const setPax = (adult, child, infant) => {
+                document.getElementById('flight-pax-adult-display').textContent = Math.max(1, adult);
+                document.getElementById('flight-pax-child-display').textContent = Math.max(0, child);
+                document.getElementById('flight-pax-infant-display').textContent = Math.max(0, infant);
+                const p = getPax();
+                const parts = ['성인 ' + p.adult];
+                if (p.child > 0) parts.push('아동 ' + p.child);
+                if (p.infant > 0) parts.push('유아 ' + p.infant);
+                passengerText.textContent = parts.join(', ');
+            };
+            passengerBtn.onclick = (e) => {
+                e.stopPropagation();
+                const open = passengerPopover.hidden;
+                passengerPopover.hidden = !open;
+                passengerBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            };
+            document.querySelectorAll('.flight-passenger-plus').forEach(btn => {
+                btn.onclick = () => {
+                    const p = getPax();
+                    const key = btn.getAttribute('data-passenger');
+                    if (key === 'adult') setPax(p.adult + 1, p.child, p.infant);
+                    else if (key === 'child') setPax(p.adult, p.child + 1, p.infant);
+                    else setPax(p.adult, p.child, p.infant + 1);
+                };
+            });
+            document.querySelectorAll('.flight-passenger-minus').forEach(btn => {
+                btn.onclick = () => {
+                    const p = getPax();
+                    const key = btn.getAttribute('data-passenger');
+                    if (key === 'adult') setPax(Math.max(1, p.adult - 1), p.child, p.infant);
+                    else if (key === 'child') setPax(p.adult, Math.max(0, p.child - 1), p.infant);
+                    else setPax(p.adult, p.child, Math.max(0, p.infant - 1));
+                };
+            });
+            document.addEventListener('click', (e) => {
+                if (passengerPopover && !passengerPopover.hidden && !document.getElementById('flight-passenger-wrap').contains(e.target)) {
+                    passengerPopover.hidden = true;
+                    passengerBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+
             // 항공권 검색 → 투어비스 새 창 이동
             document.getElementById('flight-search-btn').onclick = () => {
                 const from = document.getElementById('flight-from-code').innerText.trim();
                 const to = document.getElementById('flight-to-code').innerText.trim();
                 const start = document.getElementById('flight-date-start').value;
-                const pax = document.getElementById('flight-pax').value;
+                const end = document.getElementById('flight-date-end').value;
                 const cabin = document.getElementById('flight-cabin').value;
+                const p = getPax();
 
                 if (!from || !to || !start) {
                     alert('출발/도착 공항과 출발 날짜를 먼저 선택해 주세요.');
@@ -263,9 +551,15 @@
                     return;
                 }
 
-                // 3박 4일: 출발일 기준 +3일 귀국
-                const retDate = new Date(depDate.getTime());
-                retDate.setDate(retDate.getDate() + 3);
+                let retDate;
+                if (end) {
+                    retDate = new Date(end);
+                    if (Number.isNaN(retDate.getTime())) retDate = new Date(depDate.getTime());
+                } else {
+                    retDate = new Date(depDate.getTime());
+                    retDate.setDate(retDate.getDate() + 3);
+                }
+                if (retDate.getTime() < depDate.getTime()) retDate = new Date(depDate.getTime());
 
                 const fmt = (d) => {
                     const y = d.getFullYear();
@@ -278,7 +572,7 @@
                 const retStr = fmt(retDate);
                 const toCode = to.toLowerCase();
 
-                const url = `https://air.tourvis.com/flight/available/icn-${depStr}-${toCode}/${toCode}-${retStr}-icn?journeyType=RT&adult=${pax}&child=0&infant=0&cabin=${cabin === 'economy' ? 'Y' : cabin === 'premium' ? 'W' : cabin === 'business' ? 'C' : 'F'}`;
+                const url = `https://air.tourvis.com/flight/available/icn-${depStr}-${toCode}/${toCode}-${retStr}-icn?journeyType=RT&adult=${p.adult}&child=${p.child}&infant=${p.infant}&cabin=${cabin === 'economy' ? 'Y' : cabin === 'premium' ? 'W' : cabin === 'business' ? 'C' : 'F'}`;
 
                 window.open(url, '_blank', 'noopener,noreferrer');
             };
