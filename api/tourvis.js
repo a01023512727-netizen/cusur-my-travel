@@ -34,8 +34,11 @@ module.exports = async (req, res) => {
     res.send(text);
   } catch (e) {
     console.error("TOURVIS API error:", e);
+    const message = e.message || String(e);
+    const cause = e.cause ? (e.cause.message || String(e.cause)) : null;
     return res.status(500).json({
-      error: String(e.message || e),
+      error: message,
+      cause: cause || undefined,
       code: "TOURVIS_REQUEST_FAILED",
     });
   }
