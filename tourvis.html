@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOURVIS API 연동</title>
+    <link rel="stylesheet" href="style.css?v=20260302">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .tourvis-page { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .tourvis-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+        .tourvis-desc { color: #6b7280; font-size: 0.875rem; margin-bottom: 24px; }
+        .tourvis-actions { margin-bottom: 20px; }
+        .tourvis-btn {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .tourvis-btn:hover { background: #1d4ed8; }
+        .tourvis-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        .tourvis-result {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: ui-monospace, monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 70vh;
+            overflow: auto;
+        }
+        .tourvis-error { color: #f87171; }
+        .tourvis-status { font-size: 0.875rem; color: #6b7280; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Beyond Borders 최강</div>
+            <ul class="nav-links">
+                <li><a href="index.html">여행지</a></li>
+                <li><a href="sports.html">스포츠</a></li>
+                <li><a href="tourvis.html" class="active">TOURVIS</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="tourvis-page">
+        <h1 class="tourvis-title">TOURVIS API 연동 테스트</h1>
+        <p class="tourvis-desc">getAirports (ssCode=BTMS, searchContext=TYO) 호출 후 응답 원문을 표시합니다.</p>
+
+        <div class="tourvis-actions">
+            <button type="button" class="tourvis-btn" id="tourvis-call-btn">API 호출</button>
+        </div>
+
+        <p class="tourvis-status" id="tourvis-status">—</p>
+        <pre class="tourvis-result" id="tourvis-result">버튼을 클릭하면 API를 호출하고 응답을 여기에 표시합니다.</pre>
+    </main>
+
+    <script>
+        const btn = document.getElementById("tourvis-call-btn");
+        const status = document.getElementById("tourvis-status");
+        const result = document.getElementById("tourvis-result");
+
+        btn.addEventListener("click", async () => {
+            btn.disabled = true;
+            status.textContent = "호출 중...";
+            result.textContent = "";
+
+            try {
+                const res = await fetch("/api/tourvis-airports");
+                const raw = await res.text();
+                status.textContent = res.ok
+                    ? `HTTP ${res.status} (성공)`
+                    : `HTTP ${res.status} (오류)`;
+
+                try {
+                    const parsed = JSON.parse(raw);
+                    result.textContent = JSON.stringify(parsed, null, 2);
+                } catch {
+                    result.textContent = raw;
+                }
+
+                if (!res.ok) result.classList.add("tourvis-error");
+                else result.classList.remove("tourvis-error");
+            } catch (err) {
+                status.textContent = "요청 실패";
+                result.textContent = String(err.message || err);
+                result.classList.add("tourvis-error");
+            }
+
+            btn.disabled = false;
+        });
+    </script>
+</body>
+</html>
