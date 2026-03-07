@@ -22,14 +22,108 @@
         </nav>
     </header>
 
-    <section class="hero">
-        <div class="hero-content">
-            <h1 id="sheet-title">로딩 중...</h1>
-            <p id="sheet-subtitle">데이터를 불러오는 중입니다.</p>
+    <section class="hero hero-banner hero-banner-stage">
+        <div class="hero-banner-bg">
+            <img src="https://images.unsplash.com/photo-1459749411177-042180ce673c?auto=format&fit=crop&q=80&w=2070" alt="" class="hero-banner-img">
+        </div>
+        <nav class="hero-banner-nav" aria-label="주요 메뉴">
+            <div class="hero-banner-nav-inner">
+                <a href="#" class="hero-banner-nav-link">여행지 <span class="hero-banner-nav-chevron" aria-hidden="true">▼</span></a>
+                <a href="#" class="hero-banner-nav-link">체험 <span class="hero-banner-nav-chevron" aria-hidden="true">▼</span></a>
+                <a href="#" class="hero-banner-nav-link">America250</a>
+                <a href="#" class="hero-banner-nav-link">로드 트립</a>
+                <a href="#" class="hero-banner-nav-link hero-banner-nav-link-active">주요 행사</a>
+            </div>
+        </nav>
+        <div class="hero-banner-center">
+            <h1 class="hero-banner-big-title">FESTIVAL THE BIG STAGE</h1>
+            <div class="hero-banner-idea">
+                <span class="hero-banner-idea-icon" aria-hidden="true">✨</span>
+                <span class="hero-banner-idea-text">축제 아이디어 얻기</span>
+            </div>
+            <div class="hero-banner-quick-links">
+                <a href="#calendar-section" class="hero-banner-quick-btn"><span class="hero-banner-quick-icon">🏳</span> 대규모 이벤트 알아보기</a>
+                <a href="#calendar-section" class="hero-banner-quick-btn"><span class="hero-banner-quick-icon">🔍</span> 연례 행사 찾기</a>
+                <a href="#calendar-section" class="hero-banner-quick-btn"><span class="hero-banner-quick-icon">🎵</span> 음악 살펴보기</a>
+                <a href="#calendar-section" class="hero-banner-quick-btn"><span class="hero-banner-quick-icon">🍴</span> 음식 및 음료 축하하기</a>
+            </div>
+        </div>
+        <div class="hero-banner-fade"></div>
+    </section>
+
+    <div class="hero-below-wrap">
+        <div class="hero-search-card">
+            <span class="hero-search-card-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="hero-search-input" class="hero-search-card-input" placeholder="어떤 축제로 떠나고 싶으신가요?" aria-label="축제 검색">
+            <button type="button" id="hero-search-btn" class="hero-search-card-btn">검색</button>
+        </div>
+    </div>
+
+    <!-- 축제 캘린더 (시즌별 축제보다 위에 배치) -->
+    <section id="calendar-section" class="calendar-section calendar-section-top">
+        <div class="calendar-wrap">
+            <h2 class="calendar-title">축제 일정표</h2>
+            <p class="calendar-subtitle">원하는 날짜를 선택해 상세 정보를 확인하세요.</p>
+            <p class="calendar-tip-inline">💡 여행 꿀팁 — 축제 기간 항공권은 3개월 전에 예약하는 것이 가장 저렴합니다. 인근 도시 공항을 활용해보세요!</p>
+            <div class="calendar-layout">
+                <div class="calendar-main">
+                    <div class="calendar-nav">
+                        <button type="button" id="calendar-prev" class="calendar-nav-btn" aria-label="이전 달">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <span id="calendar-month-label" class="calendar-month-label">2024년 5월</span>
+                        <button type="button" id="calendar-next" class="calendar-nav-btn" aria-label="다음 달">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                    </div>
+                    <div class="calendar-grid-head">
+                        <span class="calendar-head-day calendar-head-sun">일</span>
+                        <span class="calendar-head-day">월</span>
+                        <span class="calendar-head-day">화</span>
+                        <span class="calendar-head-day">수</span>
+                        <span class="calendar-head-day">목</span>
+                        <span class="calendar-head-day">금</span>
+                        <span class="calendar-head-day calendar-head-sat">토</span>
+                    </div>
+                    <div id="calendar-grid" class="calendar-grid">
+                        <!-- JS로 채움 -->
+                    </div>
+                </div>
+                <aside class="calendar-side">
+                    <div class="calendar-side-card">
+                        <h3 id="calendar-side-title" class="calendar-side-title">날짜를 선택하세요</h3>
+                        <div id="calendar-side-content" class="calendar-side-content">
+                            <div class="calendar-side-placeholder">
+                                <span class="calendar-side-icon" aria-hidden="true">📅</span>
+                                <p>캘린더에서 날짜를 클릭하여<br>상세 정보를 확인하세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
         </div>
     </section>
 
-    <!-- 다가오는 축제 탐험 (계절별 퀵 필터 + 카드 그리드) -->
+    <!-- 구글 캘린더 등록 모달 (상단 캘린더용) -->
+    <div id="calendar-modal" class="calendar-modal" role="dialog" aria-labelledby="calendar-modal-title" aria-modal="true" hidden>
+        <div class="calendar-modal-backdrop"></div>
+        <div class="calendar-modal-box">
+            <button type="button" class="calendar-modal-close" aria-label="닫기">&times;</button>
+            <div class="calendar-modal-icon">📅</div>
+            <h2 id="calendar-modal-title" class="calendar-modal-title">구글 캘린더 등록</h2>
+            <p id="calendar-modal-desc" class="calendar-modal-desc"></p>
+            <form id="calendar-modal-form" class="calendar-modal-form">
+                <div class="calendar-modal-field">
+                    <label for="calendar-modal-email" class="visually-hidden">이메일</label>
+                    <input type="email" id="calendar-modal-email" placeholder="google-account@gmail.com" required>
+                </div>
+                <button type="submit" class="calendar-modal-submit">등록 완료하기</button>
+            </form>
+            <p class="calendar-modal-note">입력하신 이메일 정보는 일정 등록용으로만 일시적으로 사용됩니다.</p>
+        </div>
+    </div>
+
+    <!-- 시즌별 축제 탐험 (계절별 퀵 필터 + 카드 그리드) -->
     <section class="upcoming-section">
         <div class="upcoming-wrap">
             <div class="upcoming-header">
@@ -72,6 +166,17 @@
         <div class="coming-wrap">
             <h2 class="coming-title">다가오는 축제</h2>
             <p class="coming-subtitle">곧 다가올 축제 일정을 한눈에 확인하고 계획을 세워 보세요.</p>
+            <div class="coming-filters">
+                <label for="coming-country-select" class="coming-filter-label">국가</label>
+                <select id="coming-country-select" class="coming-filter-select" aria-label="국가별 필터">
+                    <option value="">전체</option>
+                </select>
+                <label for="coming-theme-select" class="coming-filter-label">테마</label>
+                <select id="coming-theme-select" class="coming-filter-select" aria-label="테마별 필터">
+                    <option value="">전체</option>
+                </select>
+                <button type="button" id="coming-filter-reset" class="coming-filter-reset">초기화</button>
+            </div>
             <div id="coming-list" class="coming-list">
                 <!-- JS로 채움 -->
             </div>
@@ -363,17 +468,22 @@
     <script src="components/ChatWidget.js?v=20260302"></script>
 
     <script>
-        // 히어로 섹션 텍스트 로드
-        fetch("/api/sheet")
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('sheet-title').innerText = data.title;
-                document.getElementById('sheet-subtitle').innerText = data.subtitle;
-            })
-            .catch(() => {
-                document.getElementById('sheet-title').innerText = "Global Festivals";
-                document.getElementById('sheet-subtitle').innerText = "전 세계의 축제를 한눈에 확인하세요";
+        // 메인 문구는 고정 (Google Sheet 미연동)
+
+        // 배너 검색: 축제 찾기 클릭 시 캘린더 섹션으로 스크롤
+        const heroSearchBtn = document.getElementById('hero-search-btn');
+        const heroSearchInput = document.getElementById('hero-search-input');
+        if (heroSearchBtn) {
+            heroSearchBtn.addEventListener('click', () => {
+                const el = document.getElementById('calendar-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
+        }
+        if (heroSearchInput) {
+            heroSearchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') heroSearchBtn?.click();
+            });
+        }
 
         window.onload = () => {
             window.festivalMap = new FestivalMap('map');

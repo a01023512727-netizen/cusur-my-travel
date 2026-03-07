@@ -50,7 +50,7 @@ body {
     font-size: 0.9rem;
 }
 
-/* 히어로 */
+/* 히어로 (기본: 기존 스타일 유지) */
 .hero {
     height: 60vh;
     background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
@@ -76,6 +76,247 @@ body {
     font-size: 1.05rem;
     margin: 0 auto;
     opacity: 0.95;
+}
+
+/* 히어로 배너 (America 스타일: 대형 배경 + 네비 + 빅 타이틀 + 퀵 링크) */
+.hero-banner-stage {
+    height: 650px;
+    background: #000;
+    align-items: stretch;
+}
+
+.hero-banner-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.hero-banner-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+}
+
+.hero-banner-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 30;
+    padding: 1.5rem 1rem;
+}
+
+.hero-banner-nav-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem 2rem;
+}
+
+.hero-banner-nav-link {
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    opacity: 0.9;
+    transition: color 0.2s;
+}
+
+.hero-banner-nav-link:hover {
+    color: #93c5fd;
+}
+
+.hero-banner-nav-chevron {
+    font-size: 0.65rem;
+    vertical-align: middle;
+}
+
+.hero-banner-nav-link-active {
+    border-bottom: 2px solid #fff;
+    padding-bottom: 2px;
+    opacity: 1;
+}
+
+.hero-banner-center {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.hero-banner-big-title {
+    font-size: 3rem;
+    line-height: 1;
+    font-weight: 900;
+    color: #fff;
+    margin: 0 0 2rem;
+    letter-spacing: -0.04em;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+@media (min-width: 768px) {
+    .hero-banner-big-title {
+        font-size: 6rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-banner-big-title {
+        font-size: 8rem;
+    }
+}
+
+.hero-banner-idea {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 1rem;
+}
+
+.hero-banner-idea-icon {
+    font-size: 1rem;
+}
+
+.hero-banner-quick-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.hero-banner-quick-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    color: #000;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-decoration: none;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.hero-banner-quick-btn:hover {
+    background: #fff;
+    transform: translateY(-2px);
+}
+
+.hero-banner-quick-icon {
+    font-size: 0.875rem;
+}
+
+.hero-banner-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 8rem;
+    background: linear-gradient(to top, #f8fafc, transparent);
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* 배너 아래 플로팅 검색 카드 */
+.hero-below-wrap {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+    margin-top: -4rem;
+    position: relative;
+    z-index: 20;
+    margin-bottom: 3rem;
+}
+
+.hero-search-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #fff;
+    padding: 1rem 1.25rem;
+    border-radius: 2rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid #f1f5f9;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hero-search-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+}
+
+.hero-search-card-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.hero-search-card-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.75rem 0;
+    border: none;
+    outline: none;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    background: transparent;
+}
+
+.hero-search-card-input::placeholder {
+    color: #94a3b8;
+}
+
+.hero-search-card-btn {
+    flex-shrink: 0;
+    padding: 1rem 2.5rem;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #fff;
+    background: #0f172a;
+    border: none;
+    border-radius: 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.hero-search-card-btn:hover {
+    background: #000;
+}
+
+/* 상단 캘린더 섹션 (배너 바로 아래, 카드처럼 살짝 겹치게) */
+.calendar-section-top {
+    margin-top: -3rem;
+    position: relative;
+    z-index: 20;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+@media (max-width: 640px) {
+    .calendar-section-top {
+        margin-top: -2rem;
+        padding-top: 1.5rem;
+    }
 }
 
 /* 컨테이너 */
@@ -435,8 +676,75 @@ body {
 .coming-subtitle {
     font-size: 1rem;
     color: rgba(255, 255, 255, 0.85);
-    margin: 0 0 32px;
+    margin: 0 0 20px;
     line-height: 1.5;
+}
+
+.coming-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    margin-bottom: 24px;
+}
+
+.coming-filter-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.coming-filter-select {
+    min-width: 140px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    cursor: pointer;
+}
+
+.coming-filter-select:hover,
+.coming-filter-select:focus {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.5);
+    outline: none;
+}
+
+.coming-filter-select option {
+    background: #2f343c;
+    color: #fff;
+}
+
+.coming-filter-reset {
+    padding: 10px 18px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #2f343c;
+    background: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.coming-filter-reset:hover {
+    background: #e5e7eb;
+}
+
+.coming-filter-reset:active {
+    transform: scale(0.98);
+}
+
+.coming-list-empty {
+    padding: 48px 24px;
+    text-align: center;
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0;
+    background: #fff;
+    border-radius: 1.5rem;
 }
 
 .coming-list {
@@ -603,6 +911,510 @@ body {
 .coming-list-arrow svg {
     width: 18px;
     height: 18px;
+}
+
+/* =====================================================
+   축제 캘린더 (구글 시트 연동)
+   ===================================================== */
+.calendar-section {
+    background: #f8fafc;
+    padding: 48px 5% 64px;
+}
+
+.calendar-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.calendar-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 8px;
+}
+
+.calendar-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0 0 8px;
+    line-height: 1.5;
+}
+
+.calendar-tip-inline {
+    font-size: 0.9375rem;
+    color: #475569;
+    margin: 0 0 28px;
+    line-height: 1.5;
+}
+
+.calendar-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 1024px) {
+    .calendar-layout {
+        grid-template-columns: 1fr 320px;
+        gap: 32px;
+    }
+}
+
+.calendar-main {
+    background: #fff;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.calendar-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #fff;
+    border-radius: 10px;
+    color: #475569;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.calendar-nav-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.calendar-month-label {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.calendar-grid-head {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.calendar-head-day {
+    padding: 10px 4px;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+}
+
+.calendar-head-sun { color: #dc2626; }
+.calendar-head-sat { color: #2563eb; }
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-cell {
+    min-height: 72px;
+    padding: 6px;
+    border: 1px solid #f1f5f9;
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.calendar-cell:hover {
+    background: #f8fafc;
+}
+
+.calendar-cell-empty {
+    background: #f8fafc;
+    cursor: default;
+}
+
+.calendar-cell-today .calendar-cell-num {
+    background: #2563eb;
+    color: #fff;
+}
+
+.calendar-cell-selected {
+    background: #eff6ff;
+    box-shadow: inset 0 0 0 2px #2563eb;
+}
+
+.calendar-cell-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    flex-shrink: 0;
+}
+
+.calendar-cell-dots {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+    max-height: 44px;
+    min-height: 0;
+}
+
+.calendar-dot {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-dot-rose { background: #f43f5e; }
+.calendar-dot-purple { background: #a855f7; }
+.calendar-dot-blue { background: #3b82f6; }
+.calendar-dot-emerald { background: #10b981; }
+.calendar-dot-amber { background: #f59e0b; }
+.calendar-dot-pink { background: #ec4899; }
+
+.calendar-dot-more {
+    font-size: 10px;
+    color: #64748b;
+    padding: 2px 4px;
+}
+
+/* 캘린더 사이드 패널 */
+.calendar-side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.calendar-side-card {
+    background: #fff;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.calendar-side-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 16px;
+}
+
+.calendar-side-content {
+    min-height: 120px;
+}
+
+.calendar-side-placeholder,
+.calendar-side-empty {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.875rem;
+    padding: 24px 12px;
+    margin: 0;
+}
+
+.calendar-side-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.6;
+}
+
+.calendar-side-item {
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    margin-bottom: 12px;
+}
+
+.calendar-side-item:last-child {
+    margin-bottom: 0;
+}
+
+.calendar-side-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.calendar-side-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 6px;
+}
+
+.calendar-side-meta {
+    font-size: 0.8125rem;
+    color: #64748b;
+    margin: 0 0 8px;
+}
+
+.calendar-side-desc {
+    font-size: 0.8125rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0 0 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.calendar-side-add,
+.calendar-side-flight {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin-bottom: 6px;
+}
+
+.calendar-side-add {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #2563eb;
+}
+
+.calendar-side-add:hover {
+    background: #eff6ff;
+}
+
+.calendar-side-flight {
+    background: #2563eb;
+    color: #fff;
+}
+
+.calendar-side-flight:hover {
+    background: #1d4ed8;
+}
+
+.calendar-tip {
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+    color: #fff;
+    border-radius: 1rem;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.calendar-tip strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.calendar-tip p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* 캘린더 모달 */
+.calendar-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.calendar-modal[hidden] {
+    display: none;
+}
+
+.calendar-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.calendar-modal-box {
+    position: relative;
+    background: #fff;
+    border-radius: 1.5rem;
+    padding: 32px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.calendar-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #64748b;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.calendar-modal-close:hover {
+    background: #e2e8f0;
+}
+
+.calendar-modal-icon {
+    width: 64px;
+    height: 64px;
+    background: #eff6ff;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 24px;
+}
+
+.calendar-modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 8px;
+    text-align: center;
+}
+
+.calendar-modal-desc {
+    font-size: 0.9375rem;
+    color: #64748b;
+    text-align: center;
+    margin: 0 0 24px;
+    line-height: 1.5;
+}
+
+.calendar-modal-fest-name {
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.calendar-modal-form {
+    margin-bottom: 16px;
+}
+
+.calendar-modal-field {
+    margin-bottom: 12px;
+}
+
+.calendar-modal-field input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+.calendar-modal-field input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.calendar-modal-submit {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    background: #2563eb;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.calendar-modal-submit:hover {
+    background: #1d4ed8;
+}
+
+.calendar-modal-note {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-align: center;
+    margin: 0;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* 모바일: 캘린더 셀 크기 조정 */
+@media (max-width: 640px) {
+    .calendar-section {
+        padding: 32px 4% 48px;
+    }
+    .calendar-cell {
+        min-height: 64px;
+        padding: 4px;
+    }
+    .calendar-cell-num {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8125rem;
+    }
+    .calendar-cell-dots {
+        max-height: 36px;
+    }
+    .calendar-dot {
+        font-size: 9px;
+        padding: 1px 4px;
+    }
+    .calendar-nav {
+        padding: 12px 16px;
+    }
+    .calendar-month-label {
+        font-size: 1rem;
+    }
 }
 
 /* =====================================================
@@ -1505,6 +2317,13 @@ body {
     overflow-y: auto;
 }
 
+/* PC: 항공권 시트 가로 폭 넓게 */
+@media (min-width: 768px) {
+    .flight-sheet {
+        max-width: 600px;
+    }
+}
+
 @media (max-width: 520px) {
     .flight-sheet {
         left: 0;
@@ -1870,12 +2689,12 @@ body {
 }
 
 .flight-calendar-icon {
-    font-size: 16px;
+    font-size: 20px;
     flex-shrink: 0;
 }
 
 .flight-calendar-title {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 700;
     color: #374151;
     white-space: nowrap;
@@ -1895,8 +2714,8 @@ body {
 }
 
 .flight-quick-btn {
-    padding: 5px 10px;
-    font-size: 11px;
+    padding: 6px 12px;
+    font-size: 14px;
     font-weight: 700;
     border-radius: 8px;
     border: none;
@@ -1917,9 +2736,9 @@ body {
 }
 
 .flight-quick-price-txt {
-    font-size: 9px;
+    font-size: 12px;
     color: #9ca3af;
-    margin-top: 2px;
+    margin-top: 4px;
     font-weight: 500;
 }
 
@@ -1984,16 +2803,16 @@ body {
 }
 
 .flight-date-label {
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
     color: #9ca3af;
-    margin: 0 0 2px;
+    margin: 0 0 4px;
     text-transform: uppercase;
     letter-spacing: 0.02em;
 }
 
 .flight-date-value {
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 800;
     color: #111;
     margin: 0;
@@ -2004,7 +2823,7 @@ body {
 }
 
 .flight-date-arrow {
-    font-size: 14px;
+    font-size: 18px;
     color: #d1d5db;
     flex-shrink: 0;
     align-self: center;
@@ -2013,11 +2832,11 @@ body {
 .flight-recommend-bar {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 8px 10px;
+    gap: 8px;
+    padding: 10px 12px;
     background: #eff6ff;
     border-radius: 8px;
-    font-size: 11px;
+    font-size: 14px;
     min-width: 0;
 }
 
@@ -2034,7 +2853,8 @@ body {
 
 .flight-recommend-text {
     color: #374151;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 14px;
 }
 
 .flight-recommend-line {
@@ -2051,12 +2871,14 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 14px;
 }
 
 .flight-recommend-price {
     font-weight: 700;
     color: #2563eb;
     flex-shrink: 0;
+    font-size: 15px;
 }
 
 @media (max-width: 360px) {

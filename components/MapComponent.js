@@ -7,6 +7,10 @@ class FestivalMap {
     this.selectedMapFestName = null;
     this.infoWindow = null;
 
+    this.calendarCurrentDate = new Date();
+    this.calendarSelectedDate = null;
+    this.calendarModalFestival = null;
+
     this.dpTempStart = "";
     this.dpTempEnd = "";
     this.dpMonthsToRender = 12;
@@ -23,6 +27,7 @@ class FestivalMap {
         this.renderUpcomingFestivals();
         this.renderHighlights();
         this.renderComingList();
+        this.renderFestivalCalendar();
         this.initMap();
         this.renderMapList();
         this.bindMapListReset();
@@ -588,11 +593,25 @@ class FestivalMap {
         const desc = this.escapeHtml(this.clampText(f.description || "", 80));
         const dateText = [f.startDate, f.endDate].filter(Boolean).join(" ~ ") || "일정 정보 없음";
         const encodedName = encodeURIComponent(f.name || "");
+        const openArgs = encodeURIComponent(JSON.stringify({
+          toCode: (f.airport || "").toUpperCase(),
+          toCity: f.country || "",
+          festName: f.name || "",
+          startDate: f.startDate || "",
+          endDate: f.endDate || "",
+          imageUrl: (f.imageUrl || "").trim() || "",
+          label: (f.label || "").trim() || "",
+          country: (f.country || "").trim() || "",
+          locality: (f.locality || "").trim() || "",
+          description: (f.description || "").trim() || "",
+          lat: f.lat != null ? Number(f.lat) : null,
+          lng: f.lng != null ? Number(f.lng) : null
+        }));
 
         const seasonIcon = season === "봄" ? "🌸" : season === "여름" ? "☀️" : season === "가을" ? "🍁" : season === "겨울" ? "❄️" : "";
 
         return `
-          <div class="upcoming-card" onclick="window.festivalMap.showDetailByName(decodeURIComponent('${encodedName}'))">
+          <div class="upcoming-card" onclick="window.festivalMap.openFlightPanel(JSON.parse(decodeURIComponent('${openArgs}')))">
             <div class="upcoming-card-img-wrap">
               <img src="${this.escapeHtml(imgUrl)}" alt="${title}" class="upcoming-card-img" loading="lazy">
               <span class="upcoming-card-badge upcoming-card-badge-theme">${theme}</span>
@@ -604,7 +623,7 @@ class FestivalMap {
               <p class="upcoming-card-desc">${desc}</p>
               <div class="upcoming-card-footer">
                 <span class="upcoming-card-date">📅 ${this.escapeHtml(dateText)}</span>
-                <span class="upcoming-card-link" aria-label="자세히 보기">→</span>
+                <span class="upcoming-card-link" aria-label="항공권 알아보기" onclick="event.stopPropagation(); window.festivalMap.openFlightPanel(JSON.parse(decodeURIComponent('${openArgs}')));">→</span>
               </div>
             </div>
           </div>
@@ -699,7 +718,7 @@ class FestivalMap {
                 ${images.map((url, idx) => {
         const safeUrl = this.escapeHtml(url);
         return `
-                    <div class="carousel-item" onclick="window.festivalMap.showDetailByName(decodeURIComponent('${encodedName}'))">
+                    <div class="carousel-item" onclick="window.festivalMap.openFlightPanel(JSON.parse(decodeURIComponent('${openArgs}')))">
                       <img src="${safeUrl}" alt="${name} image ${idx + 1}">
                     </div>
                   `;
@@ -719,7 +738,7 @@ class FestivalMap {
 
             <!-- ✅ 텍스트 -->
             <div class="dark-text">
-              <div class="dark-card-header" onclick="window.festivalMap.showDetailByName(decodeURIComponent('${encodedName}'))">
+              <div class="dark-card-header" onclick="window.festivalMap.openFlightPanel(JSON.parse(decodeURIComponent('${openArgs}')))">
                 <div class="dark-card-dot"></div>
 
                 <div class="dark-card-headings" style="min-width:0;">
@@ -758,48 +777,102 @@ class FestivalMap {
   }
 
   // =========================
-  // 다가오는 축제 (리스트형)
+  // 다가오는 축제 (리스트형) + 국가/테마 필터
   // =========================
   renderComingList() {
     const container = document.getElementById("coming-list");
+    const countrySelect = document.getElementById("coming-country-select");
+    const themeSelect = document.getElementById("coming-theme-select");
+    const resetBtn = document.getElementById("coming-filter-reset");
     if (!container) return;
 
-    const list = this.allFestivals;
-    const arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+    const countries = [...new Set(this.allFestivals.map((f) => (f.country || "").trim()).filter(Boolean))].sort();
+    const themes = [...new Set(this.allFestivals.map((f) => (f.label || "").trim()).filter(Boolean))].sort();
 
-    container.innerHTML = list.map((f, idx) => {
-      const theme = this.escapeHtml((f.label || "").trim()) || "";
-      const title = this.escapeHtml(f.name || "");
-      const desc = this.escapeHtml((f.description || "").trim());
-      const country = this.escapeHtml(f.country || "");
-      const dateStr = (f.startDate || "").split(" ")[0] || (f.startDate || "") || "";
-      const imgUrl = (f.imageUrl || "").trim();
-      const encodedName = encodeURIComponent(f.name || "");
+    if (countrySelect && countrySelect.options.length <= 1) {
+      countrySelect.innerHTML = '<option value="">전체</option>' + countries.map((c) => `<option value="${this.escapeHtml(c)}">${this.escapeHtml(c)}</option>`).join("");
+    }
+    if (themeSelect && themeSelect.options.length <= 1) {
+      themeSelect.innerHTML = '<option value="">전체</option>' + themes.map((t) => `<option value="${this.escapeHtml(t)}">${this.escapeHtml(t)}</option>`).join("");
+    }
 
-      const thumbBlock = imgUrl
-        ? `<div class="coming-list-thumb"><img src="${this.escapeHtml(imgUrl)}" alt="${title}" loading="lazy"></div>`
-        : "";
+    const getFilteredList = () => {
+      let list = this.allFestivals;
+      const country = (countrySelect && countrySelect.value || "").trim();
+      const theme = (themeSelect && themeSelect.value || "").trim();
+      if (country) list = list.filter((f) => (f.country || "").trim() === country);
+      if (theme) list = list.filter((f) => (f.label || "").trim() === theme);
+      return list;
+    };
 
-      return `
-        <div class="coming-list-item" onclick="window.festivalMap.showComingDetail(decodeURIComponent('${encodedName}'))">
-          <div class="coming-list-left">
-            ${thumbBlock}
-            <div class="coming-list-meta">
-              ${theme ? `<span class="coming-list-theme">${theme}</span>` : ""}
-              <h4 class="coming-list-name">${title}</h4>
+    const render = () => {
+      const list = getFilteredList();
+      const arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+
+      if (list.length === 0) {
+        container.innerHTML = '<p class="coming-list-empty">선택한 조건에 맞는 축제가 없습니다.</p>';
+        return;
+      }
+
+      container.innerHTML = list.map((f) => {
+        const themeLabel = this.escapeHtml((f.label || "").trim()) || "";
+        const title = this.escapeHtml(f.name || "");
+        const desc = this.escapeHtml((f.description || "").trim());
+        const country = this.escapeHtml(f.country || "");
+        const dateStr = (f.startDate || "").split(" ")[0] || (f.startDate || "") || "";
+        const imgUrl = (f.imageUrl || "").trim();
+        const openArgs = encodeURIComponent(JSON.stringify({
+          toCode: (f.airport || "").toUpperCase(),
+          toCity: f.country || "",
+          festName: f.name || "",
+          startDate: f.startDate || "",
+          endDate: f.endDate || "",
+          imageUrl: (f.imageUrl || "").trim() || "",
+          label: (f.label || "").trim() || "",
+          country: (f.country || "").trim() || "",
+          locality: (f.locality || "").trim() || "",
+          description: (f.description || "").trim() || "",
+          lat: f.lat != null ? Number(f.lat) : null,
+          lng: f.lng != null ? Number(f.lng) : null
+        }));
+
+        const thumbBlock = imgUrl
+          ? `<div class="coming-list-thumb"><img src="${this.escapeHtml(imgUrl)}" alt="${title}" loading="lazy"></div>`
+          : "";
+
+        return `
+          <div class="coming-list-item" onclick="window.festivalMap.openFlightPanel(JSON.parse(decodeURIComponent('${openArgs}')))">
+            <div class="coming-list-left">
+              ${thumbBlock}
+              <div class="coming-list-meta">
+                ${themeLabel ? `<span class="coming-list-theme">${themeLabel}</span>` : ""}
+                <h4 class="coming-list-name">${title}</h4>
+              </div>
+            </div>
+            <div class="coming-list-desc">${desc || "—"}</div>
+            <div class="coming-list-right">
+              <div>
+                <p class="coming-list-loc">📍 ${country || "—"}</p>
+                <p class="coming-list-date">${this.escapeHtml(dateStr)}</p>
+              </div>
+              <div class="coming-list-arrow" role="button" aria-label="항공권 알아보기" onclick="event.stopPropagation(); window.festivalMap.openFlightPanel(JSON.parse(decodeURIComponent('${openArgs}')));">${arrowSvg}</div>
             </div>
           </div>
-          <div class="coming-list-desc">${desc || "—"}</div>
-          <div class="coming-list-right">
-            <div>
-              <p class="coming-list-loc">📍 ${country || "—"}</p>
-              <p class="coming-list-date">${this.escapeHtml(dateStr)}</p>
-            </div>
-            <div class="coming-list-arrow">${arrowSvg}</div>
-          </div>
-        </div>
-      `;
-    }).join("");
+        `;
+      }).join("");
+    };
+
+    if (countrySelect) countrySelect.addEventListener("change", render);
+    if (themeSelect) themeSelect.addEventListener("change", render);
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        if (countrySelect) countrySelect.value = "";
+        if (themeSelect) themeSelect.value = "";
+        render();
+      });
+    }
+
+    render();
   }
 
   showComingDetail(name) {
@@ -825,10 +898,23 @@ class FestivalMap {
       const address = this.escapeHtml(f.address || "");
       const dateText = this.escapeHtml(`${f.startDate || ""} ~ ${f.endDate || ""}`.trim());
       const preview = this.escapeHtml(this.clampText(f.description || "", 90));
-      const encodedName = encodeURIComponent(f.name || "");
+      const openArgs = encodeURIComponent(JSON.stringify({
+        toCode: (f.airport || "").toUpperCase(),
+        toCity: f.country || "",
+        festName: f.name || "",
+        startDate: f.startDate || "",
+        endDate: f.endDate || "",
+        imageUrl: (f.imageUrl || "").trim() || "",
+        label: (f.label || "").trim() || "",
+        country: (f.country || "").trim() || "",
+        locality: (f.locality || "").trim() || "",
+        description: (f.description || "").trim() || "",
+        lat: f.lat != null ? Number(f.lat) : null,
+        lng: f.lng != null ? Number(f.lng) : null
+      }));
 
       return `
-        <div class="ios-card" onclick="window.festivalMap.focusOnMap(${Number(f.lat) || 0}, ${Number(f.lng) || 0}, decodeURIComponent('${encodedName}'))">
+        <div class="ios-card" onclick="window.festivalMap.openFlightPanel(JSON.parse(decodeURIComponent('${openArgs}')))">
           <span class="ios-badge">${label}</span>
           <h4>${name}</h4>
           <div class="ios-author">${country ? country : "국가 정보 없음"}</div>
@@ -839,6 +925,221 @@ class FestivalMap {
         </div>
       `;
     }).join('');
+  }
+
+  // =========================
+  // 축제 캘린더 (구글 시트 연동)
+  // =========================
+  parseDateToYMD(str) {
+    const s = String(str || "").trim();
+    if (!s) return null;
+    const iso = s.match(/^(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/);
+    if (iso) return `${iso[1]}-${String(parseInt(iso[2], 10)).padStart(2, "0")}-${String(parseInt(iso[3], 10)).padStart(2, "0")}`;
+    const isoShort = s.match(/^(\d{4})[.\-/](\d{1,2})$/);
+    if (isoShort) return `${isoShort[1]}-${String(parseInt(isoShort[2], 10)).padStart(2, "0")}-01`;
+    const d = new Date(s);
+    if (Number.isNaN(d.getTime())) return null;
+    const y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+    return `${y}-${String(m).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
+
+  getFestivalsByDateMap() {
+    const map = new Map();
+    this.allFestivals.forEach((f) => {
+      const startYMD = this.parseDateToYMD(f.startDate);
+      const endYMD = this.parseDateToYMD(f.endDate) || startYMD;
+      if (!startYMD) return;
+      const start = new Date(startYMD + "T12:00:00");
+      const end = endYMD ? new Date(endYMD + "T12:00:00") : start;
+      if (Number.isNaN(start.getTime())) return;
+      const endTime = Number.isNaN(end.getTime()) ? start.getTime() : end.getTime();
+      for (let t = start.getTime(); t <= endTime; t += 24 * 60 * 60 * 1000) {
+        const d = new Date(t);
+        const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        if (!map.has(ymd)) map.set(ymd, []);
+        if (!map.get(ymd).some((x) => x.name === f.name)) map.get(ymd).push(f);
+      }
+    });
+    return map;
+  }
+
+  getCalendarFestivalColor(label) {
+    const colors = ["calendar-dot-rose", "calendar-dot-purple", "calendar-dot-blue", "calendar-dot-emerald", "calendar-dot-amber", "calendar-dot-pink"];
+    let n = 0;
+    const key = String(label || "").toUpperCase();
+    for (let i = 0; i < key.length; i++) n += key.charCodeAt(i);
+    return colors[Math.abs(n) % colors.length];
+  }
+
+  renderFestivalCalendar() {
+    const gridEl = document.getElementById("calendar-grid");
+    const labelEl = document.getElementById("calendar-month-label");
+    const prevBtn = document.getElementById("calendar-prev");
+    const nextBtn = document.getElementById("calendar-next");
+    const sideTitle = document.getElementById("calendar-side-title");
+    const sideContent = document.getElementById("calendar-side-content");
+    const modal = document.getElementById("calendar-modal");
+    const modalDesc = document.getElementById("calendar-modal-desc");
+    const modalForm = document.getElementById("calendar-modal-form");
+    const modalEmail = document.getElementById("calendar-modal-email");
+    const modalClose = document.querySelector(".calendar-modal-close");
+    const modalBackdrop = document.querySelector(".calendar-modal-backdrop");
+    if (!gridEl || !labelEl) return;
+
+    const byDate = this.getFestivalsByDateMap();
+
+    const setCalendarMonth = (year, month) => {
+      this.calendarCurrentDate = new Date(year, month, 1);
+      this.renderCalendarGrid();
+      labelEl.textContent = `${this.calendarCurrentDate.getFullYear()}년 ${this.calendarCurrentDate.getMonth() + 1}월`;
+    };
+
+    this.renderCalendarGrid = () => {
+      const year = this.calendarCurrentDate.getFullYear();
+      const month = this.calendarCurrentDate.getMonth();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      const firstDay = new Date(year, month, 1).getDay();
+      const cells = [];
+
+      for (let i = 0; i < firstDay; i++) cells.push('<div class="calendar-cell calendar-cell-empty"></div>');
+      for (let d = 1; d <= totalDays; d++) {
+        const ymd = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        const festivals = byDate.get(ymd) || [];
+        const isToday = new Date().toDateString() === new Date(year, month, d).toDateString();
+        const isSelected = this.calendarSelectedDate === ymd;
+        const cellClass = ["calendar-cell", isSelected ? "calendar-cell-selected" : "", isToday ? "calendar-cell-today" : ""].filter(Boolean).join(" ");
+        const festDots = festivals.slice(0, 3).map((fest) => {
+          const color = this.getCalendarFestivalColor(fest.label);
+          const name = this.escapeHtml(fest.name || "");
+          return `<div class="calendar-dot ${color}" title="${name}">${this.escapeHtml((fest.name || "").slice(0, 6))}${(fest.name || "").length > 6 ? "…" : ""}</div>`;
+        }).join("");
+        const more = festivals.length > 3 ? `<div class="calendar-dot-more">+${festivals.length - 3}</div>` : "";
+        cells.push(
+          `<div class="${cellClass}" data-date="${ymd}" role="button" tabindex="0">
+            <span class="calendar-cell-num">${d}</span>
+            <div class="calendar-cell-dots">${festDots}${more}</div>
+          </div>`
+        );
+      }
+      gridEl.innerHTML = cells.join("");
+
+      gridEl.querySelectorAll(".calendar-cell[data-date]").forEach((el) => {
+        el.addEventListener("click", () => {
+          const date = el.getAttribute("data-date");
+          this.calendarSelectedDate = date;
+          this.renderCalendarGrid();
+          this.updateCalendarSidePanel(date, byDate.get(date) || []);
+        });
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            el.click();
+          }
+        });
+      });
+    };
+
+    this.updateCalendarSidePanel = (dateStr, festivals) => {
+      if (!sideTitle || !sideContent) return;
+      sideTitle.textContent = dateStr ? `${dateStr} 축제` : "날짜를 선택하세요";
+      if (!dateStr) {
+        sideContent.innerHTML = '<div class="calendar-side-placeholder"><span class="calendar-side-icon" aria-hidden="true">📅</span><p>캘린더에서 날짜를 클릭하여<br>상세 정보를 확인하세요.</p></div>';
+        return;
+      }
+      if (festivals.length === 0) {
+        sideContent.innerHTML = '<p class="calendar-side-empty">해당 날짜에 예정된 축제가 없습니다.</p>';
+        return;
+      }
+      const openArgsList = festivals.map((f) => encodeURIComponent(JSON.stringify({
+        toCode: (f.airport || "").toUpperCase(),
+        toCity: f.country || "",
+        festName: f.name || "",
+        startDate: f.startDate || "",
+        endDate: f.endDate || "",
+        imageUrl: (f.imageUrl || "").trim() || "",
+        label: (f.label || "").trim() || "",
+        country: (f.country || "").trim() || "",
+        locality: (f.locality || "").trim() || "",
+        description: (f.description || "").trim() || "",
+        lat: f.lat != null ? Number(f.lat) : null,
+        lng: f.lng != null ? Number(f.lng) : null
+      })));
+      sideContent.innerHTML = festivals.map((f, i) => {
+        const color = this.getCalendarFestivalColor(f.label);
+        const openArgs = openArgsList[i];
+        const name = this.escapeHtml(f.name || "");
+        const country = this.escapeHtml(f.country || "");
+        const dateRange = [f.startDate, f.endDate].filter(Boolean).join(" ~ ") || "—";
+        const desc = this.escapeHtml(this.clampText(f.description || "", 120));
+        return `
+          <div class="calendar-side-item">
+            <span class="calendar-side-badge ${color}">${country || "—"}</span>
+            <h4 class="calendar-side-name">${name}</h4>
+            <p class="calendar-side-meta">📅 ${this.escapeHtml(dateRange)}</p>
+            ${desc ? `<p class="calendar-side-desc">${desc}</p>` : ""}
+            <button type="button" class="calendar-side-add" data-open-args="${openArgs}">내 캘린더에 추가</button>
+            <button type="button" class="calendar-side-flight" data-open-args="${openArgs}">항공권 알아보기</button>
+          </div>`;
+      }).join("");
+
+      sideContent.querySelectorAll(".calendar-side-add").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const openArgs = btn.getAttribute("data-open-args");
+          if (!openArgs) return;
+          const fest = JSON.parse(decodeURIComponent(openArgs));
+          this.calendarModalFestival = fest;
+          this.openCalendarModal();
+        });
+      });
+      sideContent.querySelectorAll(".calendar-side-flight").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const openArgs = btn.getAttribute("data-open-args");
+          if (!openArgs) return;
+          this.openFlightPanel(JSON.parse(decodeURIComponent(openArgs)));
+        });
+      });
+    };
+
+    this.openCalendarModal = () => {
+      const fest = this.calendarModalFestival;
+      const modalEl = document.getElementById("calendar-modal");
+      const descEl = document.getElementById("calendar-modal-desc");
+      if (!modalEl || !descEl) return;
+      descEl.innerHTML = fest ? `<span class="calendar-modal-fest-name">[${this.escapeHtml(fest.festName || "")}]</span> 일정을<br>본인의 구글 캘린더에 바로 등록해 드립니다.` : "";
+      if (modalEmail) modalEmail.value = "";
+      modalEl.hidden = false;
+      modalEl.removeAttribute("aria-hidden");
+      document.body.style.overflow = "hidden";
+    };
+
+    this.closeCalendarModal = () => {
+      const modalEl = document.getElementById("calendar-modal");
+      if (!modalEl) return;
+      modalEl.hidden = true;
+      modalEl.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    };
+
+    if (prevBtn) prevBtn.addEventListener("click", () => setCalendarMonth(this.calendarCurrentDate.getFullYear(), this.calendarCurrentDate.getMonth() - 1));
+    if (nextBtn) nextBtn.addEventListener("click", () => setCalendarMonth(this.calendarCurrentDate.getFullYear(), this.calendarCurrentDate.getMonth() + 1));
+    if (modalClose) modalClose.addEventListener("click", () => this.closeCalendarModal());
+    if (modalBackdrop) modalBackdrop.addEventListener("click", () => this.closeCalendarModal());
+    if (modalForm) {
+      modalForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = modalEmail ? modalEmail.value.trim() : "";
+        if (email) {
+          const fest = this.calendarModalFestival;
+          alert(`${email} 계정의 구글 캘린더로 ${fest ? fest.festName : "축제"} 정보가 전송되었습니다!`);
+        }
+        this.closeCalendarModal();
+      });
+    }
+
+    setCalendarMonth(this.calendarCurrentDate.getFullYear(), this.calendarCurrentDate.getMonth());
+    this.updateCalendarSidePanel(this.calendarSelectedDate, this.calendarSelectedDate ? (byDate.get(this.calendarSelectedDate) || []) : []);
   }
 
   // =========================
@@ -923,6 +1224,20 @@ class FestivalMap {
       const imgUrl = (f.imageUrl || "").trim() || "";
       const flagUrl = this.getCountryFlagUrl(f.country || "");
       const encodedName = encodeURIComponent(f.name || "");
+      const openArgs = encodeURIComponent(JSON.stringify({
+        toCode: (f.airport || "").toUpperCase(),
+        toCity: f.country || "",
+        festName: f.name || "",
+        startDate: f.startDate || "",
+        endDate: f.endDate || "",
+        imageUrl: (f.imageUrl || "").trim() || "",
+        label: (f.label || "").trim() || "",
+        country: (f.country || "").trim() || "",
+        locality: (f.locality || "").trim() || "",
+        description: (f.description || "").trim() || "",
+        lat: f.lat != null ? Number(f.lat) : null,
+        lng: f.lng != null ? Number(f.lng) : null
+      }));
 
       let thumbHtml;
       if (imgUrl) {
@@ -934,7 +1249,7 @@ class FestivalMap {
       }
 
       return `
-        <div class="map-list-item" onclick="window.festivalMap.selectMapFestival(decodeURIComponent('${encodedName}'))">
+        <div class="map-list-item" onclick="window.festivalMap.openFlightPanel(JSON.parse(decodeURIComponent('${openArgs}')))">
           <div class="map-list-item-thumb">
             ${thumbHtml}
           </div>
@@ -943,7 +1258,7 @@ class FestivalMap {
             <p class="map-list-item-meta">📍 ${country}${country && city ? ", " : ""}${city || ""}</p>
             <p class="map-list-item-date">${this.escapeHtml(dateStr)}</p>
           </div>
-          <span class="map-list-item-arrow" aria-label="자세히 보기">→</span>
+          <span class="map-list-item-arrow" role="button" aria-label="항공권 알아보기" onclick="event.stopPropagation(); window.festivalMap.openFlightPanel(JSON.parse(decodeURIComponent('${openArgs}')));">→</span>
         </div>
       `;
     }).join("");
